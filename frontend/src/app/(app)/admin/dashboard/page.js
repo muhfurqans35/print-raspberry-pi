@@ -14,7 +14,7 @@ const Dashboard = () => {
     const { user, roles } = useAuth({ middleware: 'auth' })
 
     useEffect(() => {
-        if (!roles.includes('super_admin')) {
+        if (!roles.includes('admin')) {
             router.push('/unauthorized') // Redirect ke halaman unauthorized atau yang sesuai
         }
     }, [roles])

@@ -174,7 +174,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         if (user?.roles.includes('service_owner'))
             return '/service-owner/dashboard'
         if (user?.roles.includes('customer')) return '/customer/dashboard'
-        if (user?.roles.includes('super_admin')) return '/super_admin/dashboard'
+        if (user?.roles.includes('super_admin')) return '/super-admin/dashboard'
     }
 
     return {

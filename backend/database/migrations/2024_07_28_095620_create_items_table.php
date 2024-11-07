@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('item_id');
             $table->string('name', 100);
             $table->text('description')->nullable();
-            $table->decimal('price', 10, 2);
+            $table->decimal('price', 10);
             $table->integer('stock_quantity');
             $table->string('image', 100)->nullable();
             $table->timestamps();

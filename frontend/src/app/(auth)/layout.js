@@ -1,4 +1,4 @@
- import Link from 'next/link'
+import Link from 'next/link'
 import AuthCard from '@/app/(auth)/AuthCard'
 import ApplicationLogo from '@/components/ApplicationLogo'
 
@@ -13,7 +13,7 @@ const Layout = ({ children }) => {
                 <AuthCard
                     logo={
                         <Link href="/">
-                            <ApplicationLogo className="w-20 h-20 fill-current text-gray-500" />
+                            <ApplicationLogo />
                         </Link>
                     }>
                     {children}

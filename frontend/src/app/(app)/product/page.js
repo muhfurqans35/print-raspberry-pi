@@ -125,9 +125,9 @@ const Product = () => {
                                     <Card>
                                         <CardMedia
                                             component="img"
-                                            height="140"
                                             image={`/storage/${item.image}`}
                                             alt={item.name}
+                                            className="h-36 w-auto object-contain"
                                         />
                                         <CardContent>
                                             <Typography variant="h6">
@@ -139,7 +139,10 @@ const Product = () => {
                                                 {item.description}
                                             </Typography>
                                             <Typography variant="body1" mt={1}>
-                                                Price: Rp.{item.price}
+                                                Price: Rp.
+                                                {Number(
+                                                    item.price.toLocaleString(),
+                                                )}
                                             </Typography>
                                             <Typography variant="body1">
                                                 Stock: {item.stock_quantity}

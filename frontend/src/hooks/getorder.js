@@ -1,4 +1,3 @@
-// hooks/useOrder.js
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 
@@ -6,6 +5,8 @@ export const getOrder = filters => {
     const [data, setData] = useState({ orders: [], pagination: null })
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState(null)
+    const [isUpdating, setIsUpdating] = useState(false)
+    const [updateError, setUpdateError] = useState(null)
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -61,5 +62,53 @@ export const getOrder = filters => {
         fetchOrders()
     }, [filters])
 
-    return { data, isLoading, error }
+    const updateOrderStatus = async (orderId, newStatus) => {
+        setIsUpdating(true)
+        setUpdateError(null)
+
+        try {
+            const response = await axios.patch(
+                `/api/orders/${orderId}/status`,
+                { status: newStatus },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                    },
+                },
+            )
+
+            if (response.data.success) {
+                // Mutate data cache secara lokal untuk menghindari refetch langsung
+                setData(prevData => {
+                    const updatedOrders = prevData.orders.map(order =>
+                        order.id === orderId
+                            ? { ...order, status: newStatus }
+                            : order,
+                    )
+                    return { ...prevData, orders: updatedOrders }
+                })
+            } else {
+                throw new Error(
+                    response.data.message || 'Failed to update order status',
+                )
+            }
+        } catch (error) {
+            setUpdateError(
+                error.response?.data?.message ||
+                    'Failed to update order status',
+            )
+        } finally {
+            setIsUpdating(false)
+        }
+    }
+
+    return {
+        data,
+        isLoading,
+        error,
+        updateOrderStatus,
+        isUpdating,
+        updateError,
+    }
 }

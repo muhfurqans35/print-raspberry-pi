@@ -37,7 +37,7 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        Auth::guard('web')->login($user);
+        Auth::login($user);
 
         // Membuat token API dan mengembalikannya jika diperlukan
         $token = $user->createToken('API Token')->plainTextToken;

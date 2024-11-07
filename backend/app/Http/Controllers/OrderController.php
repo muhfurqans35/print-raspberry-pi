@@ -194,19 +194,6 @@ class OrderController extends Controller
 
         return $totalPrice;
     }
-
-    public function updateStatus($orderId, Request $request)
-    {
-        $request->validate([
-            'status' => 'required|in:new,accepted,printing,printed,pickup_ready,canceled,finished,failed',
-        ]);
-
-        $order = Order::findOrFail($orderId);
-        $order->update(['status' => $request->status]);
-
-        return response()->json($order, 200);
-    }
-
     public function index(Request $request)
     {
         try {
@@ -268,11 +255,23 @@ class OrderController extends Controller
         }
     }
 
-    public function show($id)
+     public function updateStatus(Request $request, $orderId)
     {
-        // Dapatkan satu order berdasarkan ID dengan detailnya
-        $order = Order::with('orderDetails', 'orderDetails.item')->findOrFail($id);
+        // Validasi input status
+        $request->validate([
+            'status' => 'required|string|in:new,accepted,printing,printed,pickup_ready,canceled,finished,failed'
+        ]);
 
-        return response()->json($order, 200);
+        // Temukan order berdasarkan ID
+        $order = Order::find($orderId);
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        // Update status order
+        $order->status = $request->status;
+        $order->save();
+
+        return response()->json(['message' => 'Order status updated successfully', 'order' => $order], 200);
     }
 }

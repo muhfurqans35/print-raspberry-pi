@@ -16,7 +16,7 @@ class RoleSeeder extends Seeder
          // Create permissions
         $permissions = [
             'user_management',
-            'order_creats',
+            'order_create_and_index',
             'order_management',
             'service_management',
             'product_management',
@@ -35,15 +35,15 @@ class RoleSeeder extends Seeder
          // Admin gets specific permissions
         $adminRole->givePermissionTo([
             'user_management',
-            'order_creats',
+            'order_create_and_index',
             'service_management',
             'product_management',
         ]);
         $serviceOwnerRole->givePermissionTo([
-            'service_management',
+            'service_management', 'order_management', 'order_create_and_index', 'product_management',
         ]);
         $customerRole->givePermissionTo([
-            'order_creats',
+            'order_create_and_index',
         ]);
         // Create Super Admin
         $superAdmin = User::create([
@@ -66,7 +66,7 @@ class RoleSeeder extends Seeder
             'remember_token' => Str::random(10),
         ]);
 
-        // Assign role to super admin
+        // Assign role to super admin and token
         $superAdmin->assignRole($superAdminRole);
 
         // Create Regular Admin
@@ -90,7 +90,7 @@ class RoleSeeder extends Seeder
             'remember_token' => Str::random(10),
         ]);
 
-        // Assign role to admin
+        // Assign role to admin and token
         $admin->assignRole($adminRole);
     }
 }

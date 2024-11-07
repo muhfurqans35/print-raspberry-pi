@@ -29,11 +29,12 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $identifierType = filter_var($this->input('identifier'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $credentials = [
+            $this->identifierField() => $this->input('identifier'),
+            'password' => $this->input('password'),
+        ];
 
-        $user = User::where($identifierType, $this->input('identifier'))->first();
-
-        if (!$user || !Hash::check($this->input('password'), $user->password)) {
+        if (!Auth::attempt($credentials)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -43,11 +44,15 @@ class LoginRequest extends FormRequest
 
         RateLimiter::clear($this->throttleKey());
 
+        $user = Auth::user();
         $user->tokens()->delete();
 
         return $user->createToken('API Token')->plainTextToken;
     }
-
+    protected function identifierField(): string
+    {
+        return filter_var($this->input('identifier'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+    }
     public function ensureIsNotRateLimited(): void
     {
         if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {

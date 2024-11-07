@@ -23,7 +23,7 @@ const Login = () => {
             } else if (roles.includes('service_owner')) {
                 return '/service-owner/dashboard'
             } else if (roles.includes('super_admin')) {
-                return '/superadmin/dashboard'
+                return '/super-admin/dashboard'
             } else {
                 return '/unauthorized'
             }

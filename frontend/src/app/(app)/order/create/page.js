@@ -518,12 +518,9 @@ export default function OrderPage() {
                                                 <Card>
                                                     <CardMedia
                                                         component="img"
-                                                        height="200"
-                                                        image={
-                                                            item.image_url ||
-                                                            '/api/placeholder/200/200'
-                                                        }
+                                                        image={`/storage/${item.image}`}
                                                         alt={item.name}
+                                                        className="h-36 w-auto object-contain"
                                                     />
                                                     <CardContent>
                                                         <Typography
@@ -540,8 +537,10 @@ export default function OrderPage() {
                                                         <Typography
                                                             variant="subtitle1"
                                                             color="primary">
-                                                            Rp{' '}
-                                                            {item.price.toLocaleString()}
+                                                            Rp.
+                                                            {Number(
+                                                                item.price.toLocaleString(),
+                                                            )}
                                                         </Typography>
                                                         <Typography
                                                             variant="body2"
