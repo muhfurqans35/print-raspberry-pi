@@ -18,8 +18,8 @@ return new class extends Migration
             $table->unsignedBigInteger('print_job_id')->nullable();
             $table->unsignedBigInteger('item_id')->nullable();
             $table->integer('quantity');
-            $table->decimal('price', 12, 2);
-            $table->decimal('total_price', 12, 2);
+            $table->decimal('price', 12);
+            $table->decimal('total_price', 12);
             $table->timestamps();
             $table->foreign('print_job_id')->references('print_job_id')->on('print_jobs')->onDelete('set null');
             $table->foreign('item_id')->references('item_id')->on('items')->onDelete('set null');
