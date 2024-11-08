@@ -1,8 +1,5 @@
-module fotocopyki-raspberrypi
+module raspberrypi-go
 
-go 1.19
+go 1.23.0
 
-require (
-	github.com/gorilla/mux v1.8.1 // indirect
-	github.com/muhfurqans35/print-raspberry-pi v0.0.0-20241107204050-a53b6399d7a5 // indirect
-)
+require github.com/gorilla/mux v1.8.1 // indirect
