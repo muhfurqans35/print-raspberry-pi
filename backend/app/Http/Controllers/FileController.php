@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
@@ -27,16 +26,16 @@ class FileController extends Controller
                 ], 403);
             }
 
-            if (!Storage::exists($filePath)) {
+            if (!Storage::disk('public')->exists($filePath)) {
                 return response()->json([
                     'message' => 'File not found: ' . $filePath
                 ], 404);
             }
 
-            $mimeType = Storage::mimeType($filePath);
+            $mimeType = Storage::disk('public')->mimeType($filePath);
 
             if ($this->isPreviewable($mimeType)) {
-                $file = Storage::get($filePath);
+                $file = Storage::disk('public')->get($filePath);
 
                 return Response::make($file, 200, [
                     'Content-Type' => $mimeType,
@@ -46,7 +45,7 @@ class FileController extends Controller
 
             return response()->json([
                 'filename' => basename($filePath),
-                'size' => Storage::size($filePath),
+                'size' => Storage::disk('public')->size($filePath),
                 'mime_type' => $mimeType,
                 'message' => 'This file type cannot be previewed directly'
             ]);
@@ -74,7 +73,7 @@ class FileController extends Controller
                 ], 403);
             }
 
-            if (!Storage::exists($filePath)) {
+            if (!Storage::disk('public')->exists($filePath)) {
                 return response()->json([
                     'message' => 'File not found: ' . $filePath
                 ], 404);
@@ -82,7 +81,7 @@ class FileController extends Controller
 
             $filename = basename($filePath);
 
-            return Storage::download($filePath, $filename, [
+            return Storage::disk('public')->download($filePath, $filename, [
                 'Cache-Control' => 'no-cache'
             ]);
 
@@ -95,19 +94,10 @@ class FileController extends Controller
 
     private function cleanPath($path)
     {
-        // URL decode the path
         $path = urldecode($path);
-
-        // Remove any '2F' that might appear at the start of the path
         $path = preg_replace('/^2F/', '', $path);
-
-        // Remove any double slashes
         $path = preg_replace('#/+#', '/', $path);
-
-        // Remove any leading or trailing slashes
-        $path = trim($path, '/');
-
-        return $path;
+        return trim($path, '/');
     }
 
     private function isPathAllowed($path)
@@ -116,7 +106,8 @@ class FileController extends Controller
             'print_jobs',
             'uploads',
             'public/documents',
-            'uploads/print_jobs'  // tambahkan path sesuai struktur folder Anda
+            'uploads/print_jobs',
+            'storage',
         ];
 
         foreach ($allowedPaths as $allowedPath) {
