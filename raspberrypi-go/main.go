@@ -4,8 +4,9 @@ import (
 	"log"
 	"net/http"
 
+	"raspberrypi-go/handlers"
+
 	"github.com/gorilla/mux"
-	"github.com/muhfurqans35/print-raspberry-pi/raspberrypi-go/handlers"
 )
 
 func main() {

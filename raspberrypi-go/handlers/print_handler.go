@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"strconv"
 
-	"github.com/muhfurqans35/print-raspberry-pi/tree/v1/raspberrypi-go/models"
+	"raspberrypi-go/models"
 )
 
 // Request struct untuk menerima data dari frontend
