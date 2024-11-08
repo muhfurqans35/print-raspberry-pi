@@ -62,7 +62,6 @@ export default function OrderPage() {
 
     // Function to handle file download
     const handleFileDownload = filePath => {
-        // Assuming your API endpoint for file download is /api/download
         window.open(
             `/api/download?path=${encodeURIComponent(filePath)}`,
             '_blank',
@@ -71,7 +70,6 @@ export default function OrderPage() {
 
     // Function to handle file preview
     const handleFilePreview = filePath => {
-        // Assuming your API endpoint for file preview is /api/preview
         window.open(
             `/api/preview?path=${encodeURIComponent(filePath)}`,
             '_blank',

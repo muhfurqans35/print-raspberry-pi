@@ -5,6 +5,9 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\PrinterController;
+use App\Http\Controllers\PrintJobController;
+use App\Http\Controllers\PrintRequestController;
 
 
 Route::get('/user', [UserController::class, 'index'])->middleware(['auth:sanctum']);
@@ -16,9 +19,15 @@ Route::middleware(['auth:sanctum', 'permission:order_create_and_index'])->group(
     Route::get('/download', [FileController::class, 'download'])->name('file.download');
 });
 
+
 Route::middleware(['auth:sanctum', 'permission:order_management'])->group(function () {
     Route::patch('/orders/{orderId}/status', [OrderController::class, 'updateStatus'])->name('order.status');
+
 });
+Route::apiResource('printers', PrinterController::class);
+Route::get('/printindex', [ItemController::class, 'index']);
+Route::get('/printjobs', [PrintJobController::class, 'index']);
+Route::post('/go/print', [PrintRequestController::class, 'submitPrint']);
 
 Route::middleware(['auth:sanctum', 'permission:product_management'])->group(function () {
     Route::get('/items', [ItemController::class, 'index']);

@@ -200,8 +200,11 @@ class OrderController extends Controller
             // Start with base query
             $query = Order::with(['orderDetails', 'orderDetails.item', 'orderDetails.printJob', 'user']);
 
-            // Filter by authenticated user
-            $query->where('user_id', Auth::id());
+            if(Auth::user()->hasRole('customer')) {
+                // Filter by authenticated user
+                $query->where('user_id', Auth::id());
+            }
+
             // Filter by status if provided
             if ($request->has('status') && $request->status !== 'all') {
                 $query->where('status', $request->status);
