@@ -50,7 +50,10 @@ const PrintPage = () => {
             })
             alert('Print request submitted successfully!')
         } catch (error) {
-            console.error('Error submitting print request:', error)
+            console.error(
+                'Error submitting print request:',
+                error.response ? error.response.data : error,
+            )
             alert('Failed to submit print request.')
         }
     }
