@@ -2,11 +2,11 @@ package handlers
 
 import (
 	"encoding/json"
-
+	"fmt"
+	"log"
 	"net/http"
-
+	"net/url"
 	"os/exec"
-
 	"strconv"
 )
 
@@ -22,29 +22,65 @@ type PrintRequest struct {
 func PrintHandler(w http.ResponseWriter, r *http.Request) {
 	var request PrintRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
 
+	// Log data yang diterima
+	log.Printf("Received print request: %+v", request)
+
+	// Ambil path relatif dari file yang akan diunduh
+	relativePath := request.FilePath
+	// Encode path untuk query string URL
+	encodedPath := url.QueryEscape(relativePath)
+
+	// URL untuk mengunduh file
+	url := fmt.Sprintf("http://192.168.1.15:3000/api/download?path=%s", encodedPath)
+
+	// Menyimpan file sementara di Raspberry Pi
+	tempFilePath := "/tmp/print_temp.pdf"
+
+	// Menjalankan perintah curl untuk mendownload file
+	err := downloadFileUsingCurl(url, tempFilePath)
+	if err != nil {
+		http.Error(w, "Failed to download file: "+err.Error(), http.StatusInternalServerError)
+		log.Printf("Failed to download file: %v", err)
+		return
+	}
+
+	// Setelah file berhasil disimpan, kirimkan ke printer
+	printFile(tempFilePath, request)
+}
+
+func downloadFileUsingCurl(fileURL string, destinationPath string) error {
+	// Membuat perintah curl untuk mendownload file
+	cmd := exec.Command("curl", "-L", fileURL, "--output", destinationPath)
+
+	// Menjalankan perintah curl
+	err := cmd.Run()
+	if err != nil {
+		return fmt.Errorf("failed to execute curl: %v", err)
+	}
+	return nil
+}
+
+func printFile(filePath string, request PrintRequest) {
 	// Membangun perintah untuk mengirimkan pekerjaan ke printer
 	command := []string{
 		"lp",
-		"-d", request.PrinterName, // nama printer dari request
+		"-d", request.PrinterName,
 		"-o", "media=" + request.PaperSize,
-		"-o", "color_mode=" + request.ColorMode,
+		"-o", "color_mode=" + colormode(request.ColorMode),
 		"-o", "orientation-requested=" + orientationToCUPS(request.Orientation),
 		"-n", strconv.Itoa(request.Copies),
-		request.FilePath, // Lokasi file yang akan dicetak
+		filePath,
 	}
 
+	// Jalankan perintah `lp` dengan argumen yang disiapkan
 	err := exec.Command(command[0], command[1:]...).Run()
 	if err != nil {
-		http.Error(w, "Failed to print: "+err.Error(), http.StatusInternalServerError)
-		return
+		log.Printf("Printing failed: %v", err)
 	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Print job successfully submitted"))
 }
 
 func orientationToCUPS(orientation string) string {
@@ -52,4 +88,11 @@ func orientationToCUPS(orientation string) string {
 		return "3"
 	}
 	return "4"
+}
+
+func colormode(color string) string {
+	if color == "black_white" {
+		return "monochrome"
+	}
+	return "color"
 }

@@ -15,8 +15,7 @@ Route::get('/user', [UserController::class, 'index'])->middleware(['auth:sanctum
 Route::middleware(['auth:sanctum', 'permission:order_create_and_index'])->group(function () {
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::get('/preview', [FileController::class, 'preview'])->name('file.preview');
-    Route::get('/download', [FileController::class, 'download'])->name('file.download');
+
 });
 
 
@@ -24,6 +23,8 @@ Route::middleware(['auth:sanctum', 'permission:order_management'])->group(functi
     Route::patch('/orders/{orderId}/status', [OrderController::class, 'updateStatus'])->name('order.status');
 
 });
+Route::get('/preview', [FileController::class, 'preview'])->name('file.preview');
+Route::get('/download', [FileController::class, 'download'])->name('file.download');
 Route::apiResource('printers', PrinterController::class);
 Route::get('/printindex', [ItemController::class, 'index']);
 Route::get('/printjobs', [PrintJobController::class, 'index']);
