@@ -15,7 +15,7 @@ class PrintRequestController extends Controller
         ]);
 
         // Kirim request ke API server Go yang menjalankan CUPS
-        $response = Http::post('http://raspberry-pi-ip:8080/print', $validated);
+        $response = Http::post('http://192.168.1.31:8080/api/print', $validated);
 
         if ($response->successful()) {
             return response()->json(['message' => 'Print request submitted successfully']);
