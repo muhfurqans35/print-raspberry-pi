@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { usePrintJobs } from '@/hooks/printjob'
 import { usePrinters } from '@/hooks/printer'
-import goaxios from '@/lib/goaxios'
+import axios from '@/lib/axios'
 import {
     Container,
     Typography,
@@ -44,7 +44,7 @@ const PrintPage = () => {
         }
 
         try {
-            await goaxios.post('/print', {
+            await axios.post('/api/submitPrint', {
                 printer_id: selectedPrinter,
                 print_job_id: selectedPrintJob,
             })

@@ -27,7 +27,7 @@ Route::middleware(['auth:sanctum', 'permission:order_management'])->group(functi
 Route::apiResource('printers', PrinterController::class);
 Route::get('/printindex', [ItemController::class, 'index']);
 Route::get('/printjobs', [PrintJobController::class, 'index']);
-Route::post('/go/print', [PrintRequestController::class, 'submitPrint']);
+Route::post('/submitPrint', [PrintRequestController::class, 'submitPrint']);
 
 Route::middleware(['auth:sanctum', 'permission:product_management'])->group(function () {
     Route::get('/items', [ItemController::class, 'index']);
