@@ -17,6 +17,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import useItems from '@/hooks/item'
+import Header from '../Header'
 
 const style = {
     position: 'absolute',
