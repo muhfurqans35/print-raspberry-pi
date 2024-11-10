@@ -1,7 +1,9 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { usePrintJobs } from '@/hooks/printjob'
 import { usePrinters } from '@/hooks/printer'
+import { useAuth } from '@/hooks/auth'
+import { useRouter } from 'next/navigation'
 import axios from '@/lib/axios'
 import {
     Container,
@@ -35,7 +37,14 @@ const PrintPage = () => {
 
     const [selectedPrinter, setSelectedPrinter] = useState('')
     const [selectedPrintJob, setSelectedPrintJob] = useState(null)
+    const { permissions } = useAuth()
+    const router = useRouter()
 
+    useEffect(() => {
+        if (!permissions.includes('print_management')) {
+            router.push('/unauthorized')
+        }
+    }, [permissions])
     // Fungsi untuk menangani submit print
     const handlePrintSubmit = async () => {
         if (!selectedPrinter || !selectedPrintJob) {
@@ -71,13 +80,13 @@ const PrintPage = () => {
                         <div className="p-6 bg-white border-b border-gray-200">
                             <Container>
                                 {/* List of Print Jobs */}
+                                <Typography
+                                    variant="h6"
+                                    component="h2"
+                                    sx={{ mb: 2 }}>
+                                    Select Print Job
+                                </Typography>
                                 <Paper sx={{ mb: 3 }}>
-                                    <Typography
-                                        variant="h6"
-                                        component="h2"
-                                        sx={{ mb: 2 }}>
-                                        Select Print Job
-                                    </Typography>
                                     <List>
                                         {printJobs.map(job => (
                                             <ListItem

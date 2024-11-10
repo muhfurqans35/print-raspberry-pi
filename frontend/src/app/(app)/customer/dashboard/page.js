@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/auth'
 
 const Dashboard = () => {
     const router = useRouter()
-    const { roles } = useAuth({ middleware: 'auth' })
+    const { roles } = useAuth()
 
     useEffect(() => {
         if (!roles.includes('customer')) {

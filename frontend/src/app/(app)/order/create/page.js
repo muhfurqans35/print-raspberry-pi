@@ -83,14 +83,13 @@ export default function OrderPage() {
 
     const { submitOrder } = useOrder()
     const router = useRouter()
-    const { roles } = useAuth({ middleware: 'auth' })
+    const { permissions } = useAuth()
 
-    // roles check
     useEffect(() => {
-        if (!roles.includes('customer')) {
+        if (!permissions.includes('order_create_and_index')) {
             router.push('/unauthorized')
         }
-    }, [roles])
+    }, [permissions])
 
     // Tab for Item and Print Job
     const handleTabChange = (event, newValue) => {

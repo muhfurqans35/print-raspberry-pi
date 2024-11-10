@@ -1,6 +1,8 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { usePrinters } from '@/hooks/printer'
+import { useAuth } from '@/hooks/auth'
+import { useRouter } from 'next/navigation'
 import {
     Container,
     Typography,
@@ -17,6 +19,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import Header from '../Header'
+
 const PrintersPage = () => {
     const {
         printers,
@@ -29,6 +32,14 @@ const PrintersPage = () => {
     const [name, setName] = useState('')
     const [printJobId, setPrintJobId] = useState('')
     const [editId, setEditId] = useState(null)
+    const { permissions } = useAuth()
+    const router = useRouter()
+
+    useEffect(() => {
+        if (!permissions.includes('print_management')) {
+            router.push('/unauthorized')
+        }
+    }, [permissions])
 
     const handleSubmit = e => {
         e.preventDefault()

@@ -5,17 +5,13 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/auth'
 
-// export const metadata = {
-//     title: 'Laravel - Dashboard',
-// }
-
 const Dashboard = () => {
     const router = useRouter()
-    const { user, roles } = useAuth({ middleware: 'auth' })
+    const { roles } = useAuth()
 
     useEffect(() => {
         if (!roles.includes('admin')) {
-            router.push('/unauthorized') // Redirect ke halaman unauthorized atau yang sesuai
+            router.push('/unauthorized')
         }
     }, [roles])
     return (

@@ -20,6 +20,8 @@ const Register = () => {
                 return '/admin/dashboard'
             } else if (roles.includes('customer')) {
                 return '/customer/dashboard'
+            } else if (roles.includes('super_admin')) {
+                return '/super-admin/dashboard'
             } else {
                 return '/unauthorized'
             }

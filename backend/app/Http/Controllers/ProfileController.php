@@ -20,7 +20,6 @@ class ProfileController extends Controller
             $user->update([
                 'name' => $request->input('name'),
                 'email' => $request->input('email'),
-                'company_name' => $request->input('company_name'),
                 'address' => $request->input('address'),
                 'province' => $request->input('province'),
                 'city' => $request->input('city'),

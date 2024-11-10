@@ -33,7 +33,12 @@ Route::get('/preview', [FileController::class, 'preview'])->name('file.preview')
 Route::get('/download', [FileController::class, 'download'])->name('file.download');
 
 Route::middleware(['auth:sanctum', 'permission:product_management'])->group(function () {
-    Route::apiResource('items', PrinterController::class);
+    // Route::get('/items', [ItemController::class, 'index']);
+    // Route::post('/items', [ItemController::class, 'store']);
+    // Route::get('/items/{id}', [ItemController::class, 'show']);
+    // Route::post('/items/{id}', [ItemController::class, 'update']);
+    // Route::delete('/items/{id}', [ItemController::class, 'destroy']);
+    Route::apiResource('items', ItemController::class);
 });
 
 

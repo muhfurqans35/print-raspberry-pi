@@ -2,7 +2,6 @@
 
 import Header from '@/app/(app)/Header'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/auth'
 import {
     CardContent,
@@ -14,10 +13,7 @@ import {
 import AuthSessionStatus from '@/app/(auth)/AuthSessionStatus'
 
 const Profile = () => {
-    const router = useRouter()
-    const { user, roles, updateProfile, deleteProfile, mutate } = useAuth({
-        middleware: 'auth',
-    })
+    const { user, updateProfile, deleteProfile, mutate } = useAuth()
 
     const [name, setName] = useState(user?.name || '')
     const [email, setEmail] = useState(user?.email || '')
