@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('printer_print_job', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('printer_id')->constrained('printers')->onDelete('cascade');
-            $table->foreignId('print_job_id')->constrained('print_jobs')->onDelete('cascade');
+            $table->id('print_id');
+            $table->foreignId('printer_id')->constrained('printers', 'printer_id')->onDelete('cascade');
+            $table->foreignId('print_job_id')->constrained('print_jobs', 'print_job_id')->onDelete('cascade');
             $table->timestamps();
         });
     }

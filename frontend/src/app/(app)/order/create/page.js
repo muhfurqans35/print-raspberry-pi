@@ -26,6 +26,8 @@ import { useOrder } from '@/hooks/order'
 import { useAuth } from '@/hooks/auth'
 import { useRouter } from 'next/navigation'
 import useItems from '@/hooks/item'
+import Header from '../../Header'
+
 // Constants for form options
 const PAPER_SIZES = [
     { value: 'A4s', label: 'A4s' },

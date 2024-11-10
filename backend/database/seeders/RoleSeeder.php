@@ -18,7 +18,6 @@ class RoleSeeder extends Seeder
             'user_management',
             'order_create_and_index',
             'order_management',
-            'service_management',
             'product_management',
             'print_management',
         ];
@@ -34,9 +33,7 @@ class RoleSeeder extends Seeder
         $superAdminRole->givePermissionTo(Permission::all());
          // Admin gets specific permissions
         $adminRole->givePermissionTo([
-            'user_management',
             'order_create_and_index',
-            'service_management',
             'product_management',
             'print_management',
         ]);
@@ -49,7 +46,7 @@ class RoleSeeder extends Seeder
             'username' => 'muhfurqans35',
             'email' => 'muhfurqans35@gmail.com',
             'email_verified_at' => now(),
-            'password' => Hash::make('supriadi99'),
+            'password' => Hash::make('12345678'),
             'address' => 'Btn Tabaria Tower Blok E10 No.9',
             'province' => 'Sulawesi Selatan',
             'city' => 'Makassar',
