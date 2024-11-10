@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     Button,
     TextField,
@@ -17,7 +17,9 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import useItems from '@/hooks/item'
+import { useAuth } from '@/hooks/auth'
 import Header from '../Header'
+import { useRouter } from 'next/navigation'
 
 const style = {
     position: 'absolute',
@@ -51,6 +53,14 @@ const Product = () => {
         stock_quantity: 0,
     })
     const [imageFile, setImageFile] = useState(null)
+    const { permissions } = useAuth()
+    const router = useRouter()
+
+    useEffect(() => {
+        if (!permissions.includes('product_management')) {
+            router.push('/unauthorized')
+        }
+    }, [permissions])
 
     const handleInputChange = e => {
         const { name, value } = e.target

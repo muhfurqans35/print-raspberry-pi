@@ -7,6 +7,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     const router = useRouter()
     const params = useParams()
     const [errors, setErrors] = useState([])
+    const [loading, setLoading] = useState(true)
 
     const { data: user, error, mutate } = useSWR('/api/user', () =>
         axios
@@ -15,7 +16,8 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
             .catch(err => {
                 if (err.response && err.response.status !== 409) throw err
                 router.push('/verify-email')
-            }),
+            })
+            .finally(() => setLoading(false)),
     )
 
     const csrf = async () => {
@@ -157,17 +159,18 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     }
 
     useEffect(() => {
-        if (middleware === 'guest' && redirectIfAuthenticated && user) {
-            router.push(redirectIfAuthenticated(user.roles))
+        if (!loading) {
+            if (middleware === 'guest' && redirectIfAuthenticated && user) {
+                router.push(redirectIfAuthenticated(user.roles))
+            }
+            if (
+                window.location.pathname === '/verify-email' &&
+                user?.email_verified_at
+            ) {
+                router.push(redirectIfAuthenticated(user.roles))
+            }
         }
-        if (
-            window.location.pathname === '/verify-email' &&
-            user?.email_verified_at
-        ) {
-            router.push(redirectIfAuthenticated(user.roles))
-        }
-        if (middleware === 'auth' && error) logout()
-    }, [user, error])
+    }, [loading, user, error])
 
     const getDashboardUrl = () => {
         if (user?.roles.includes('admin')) return '/admin/dashboard'
@@ -178,6 +181,8 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     return {
         user: user?.user,
         roles: user?.roles,
+        permissions: user?.permissions,
+        loading,
         login,
         register,
         forgotPassword,

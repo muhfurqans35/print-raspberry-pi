@@ -9,11 +9,11 @@ import { useAuth } from '@/hooks/auth'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import AuthSessionStatus from '@/app/(auth)/AuthSessionStatus'
-
+import Loading from '@/app/(app)/Loading'
 const Login = () => {
     const router = useRouter()
 
-    const { user, roles, login } = useAuth({
+    const { login } = useAuth({
         middleware: 'guest',
         redirectIfAuthenticated: roles => {
             if (roles.includes('admin')) {

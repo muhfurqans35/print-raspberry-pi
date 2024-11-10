@@ -1,12 +1,21 @@
 'use client'
 import { useAuth } from '@/hooks/auth'
 import Navigation from '@/app/(app)/Navigation'
-import Loading from '@/app/(app)/Loading'
 import Sidebar from '@/app/(app)/Sidebar'
 import { Box, Toolbar } from '@mui/material'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import Loading from '@/app/(app)/Loading'
 
 const AppLayout = ({ children }) => {
-    const { user } = useAuth({ middleware: 'auth' })
+    const { loading, user } = useAuth({ middleware: 'auth' })
+    const router = useRouter()
+
+    useEffect(() => {
+        if (!loading && !user) {
+            router.push('/login')
+        }
+    }, [user, router, loading])
 
     if (!user) {
         return <Loading />

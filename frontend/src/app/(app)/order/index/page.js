@@ -1,5 +1,6 @@
 'use client'
 import { getOrder } from '@/hooks/getorder'
+import { useAuth } from '@/hooks/auth'
 import {
     Container,
     Typography,
@@ -17,14 +18,14 @@ import {
     Box,
     Button,
 } from '@mui/material'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
     Add as AddIcon,
     GetApp as DownloadIcon,
     Visibility as ViewIcon,
 } from '@mui/icons-material'
-import Header from '../../Header'
+import { useRouter } from 'next/router'
 
 export default function OrderPage() {
     const [filters, setFilters] = useState({
@@ -40,6 +41,14 @@ export default function OrderPage() {
     const { data, isLoading, error } = getOrder(filters)
     const orders = data?.orders || []
     const pagination = data?.pagination
+    const { permissions } = useAuth()
+    const router = useRouter()
+
+    useEffect(() => {
+        if (!permissions.includes('order_create_and_index')) {
+            router.push('/unauthorized')
+        }
+    }, [permissions])
 
     const statusOptions = [
         'all',

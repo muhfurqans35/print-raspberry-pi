@@ -14,8 +14,10 @@ import {
     Select,
     MenuItem,
 } from '@mui/material'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { getOrder } from '@/hooks/getorder'
+import { useAuth } from '@/hooks/auth'
+import { useRouter } from 'next/navigation'
 
 export default function OrderManagementPage() {
     const [filters, setFilters] = useState({
@@ -31,6 +33,13 @@ export default function OrderManagementPage() {
         isUpdating,
         updateError,
     } = getOrder(filters)
+    const { permissions } = useAuth()
+    const router = useRouter()
+    useEffect(() => {
+        if (!permissions.includes('order_create_and_index')) {
+            router.push('/unauthorized')
+        }
+    }, [permissions])
 
     const handlePageChange = (event, newPage) => {
         setFilters(prevFilters => ({
