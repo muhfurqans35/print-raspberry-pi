@@ -33,7 +33,7 @@ const style = {
     p: 4,
 }
 
-const Product = () => {
+const Item = () => {
     const {
         items,
         loading,
@@ -280,4 +280,4 @@ const Product = () => {
     )
 }
 
-export default Product
+export default Item
