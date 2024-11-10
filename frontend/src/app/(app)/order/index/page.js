@@ -25,8 +25,8 @@ import {
     GetApp as DownloadIcon,
     Visibility as ViewIcon,
 } from '@mui/icons-material'
-import { useRouter } from 'next/router'
-
+import { useRouter } from 'next/navigation'
+import Header from '../../Header'
 export default function OrderPage() {
     const [filters, setFilters] = useState({
         status: 'all',
@@ -219,170 +219,175 @@ export default function OrderPage() {
     }
 
     return (
-        <div className="py-12">
-            <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div className="p-6 bg-white border-b border-gray-200">
-                        <Container>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    mb: 4,
-                                }}>
-                                <Typography variant="h4">
-                                    Orders List
-                                </Typography>
-                                <Link href="/order/create" passHref>
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        startIcon={<AddIcon />}>
-                                        Create Order
-                                    </Button>
-                                </Link>
-                            </Box>
-
-                            <Box sx={{ mb: 3 }}>
-                                <FormControl fullWidth sx={{ mb: 2 }}>
-                                    <InputLabel>Status</InputLabel>
-                                    <Select
-                                        value={filters.status}
-                                        onChange={e =>
-                                            handleFilterChange(
-                                                'status',
-                                                e.target.value,
-                                            )
-                                        }
-                                        label="Status">
-                                        {statusOptions.map(status => (
-                                            <MenuItem
-                                                key={status}
-                                                value={status}>
-                                                {status
-                                                    .charAt(0)
-                                                    .toUpperCase() +
-                                                    status.slice(1)}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Box>
-
-                            {isLoading ? (
-                                <Box display="flex" justifyContent="center">
-                                    <CircularProgress />
+        <>
+            <Header title="Order List" />
+            <div className="py-12">
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div className="p-6 bg-white border-b border-gray-200">
+                            <Container>
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        mb: 4,
+                                    }}>
+                                    <Link href="/order/create" passHref>
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            startIcon={<AddIcon />}>
+                                            Create Order
+                                        </Button>
+                                    </Link>
                                 </Box>
-                            ) : orders.length === 0 ? (
-                                <Typography align="center">
-                                    No orders found.
-                                </Typography>
-                            ) : (
-                                <>
-                                    <Grid container spacing={3}>
-                                        {orders.map(order => (
-                                            <Grid
-                                                item
-                                                xs={12}
-                                                key={order.order_id}>
-                                                <Card>
-                                                    <CardContent>
-                                                        <div className="flex justify-between items-start mb-4">
-                                                            <div>
-                                                                <Typography
-                                                                    variant="h6"
-                                                                    gutterBottom>
-                                                                    Order #
-                                                                    {
-                                                                        order.order_id
-                                                                    }
-                                                                </Typography>
+
+                                <Box sx={{ mb: 3 }}>
+                                    <FormControl fullWidth sx={{ mb: 2 }}>
+                                        <InputLabel>Status</InputLabel>
+                                        <Select
+                                            value={filters.status}
+                                            onChange={e =>
+                                                handleFilterChange(
+                                                    'status',
+                                                    e.target.value,
+                                                )
+                                            }
+                                            label="Status">
+                                            {statusOptions.map(status => (
+                                                <MenuItem
+                                                    key={status}
+                                                    value={status}>
+                                                    {status
+                                                        .charAt(0)
+                                                        .toUpperCase() +
+                                                        status.slice(1)}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Box>
+
+                                {isLoading ? (
+                                    <Box display="flex" justifyContent="center">
+                                        <CircularProgress />
+                                    </Box>
+                                ) : orders.length === 0 ? (
+                                    <Typography align="center">
+                                        No orders found.
+                                    </Typography>
+                                ) : (
+                                    <>
+                                        <Grid container spacing={3}>
+                                            {orders.map(order => (
+                                                <Grid
+                                                    item
+                                                    xs={12}
+                                                    key={order.order_id}>
+                                                    <Card>
+                                                        <CardContent>
+                                                            <div className="flex justify-between items-start mb-4">
+                                                                <div>
+                                                                    <Typography
+                                                                        variant="h6"
+                                                                        gutterBottom>
+                                                                        Order #
+                                                                        {
+                                                                            order.order_id
+                                                                        }
+                                                                    </Typography>
+                                                                    <Typography
+                                                                        variant="body2"
+                                                                        color="text.secondary">
+                                                                        Customer:{' '}
+                                                                        {
+                                                                            order
+                                                                                .user
+                                                                                ?.name
+                                                                        }
+                                                                    </Typography>
+                                                                </div>
                                                                 <Typography
                                                                     variant="body2"
-                                                                    color="text.secondary">
-                                                                    Customer:{' '}
+                                                                    className="px-3 py-1 rounded-full"
+                                                                    sx={{
+                                                                        backgroundColor:
+                                                                            'primary.main',
+                                                                        color:
+                                                                            'white',
+                                                                    }}>
                                                                     {
-                                                                        order
-                                                                            .user
-                                                                            ?.name
+                                                                        order.status
                                                                     }
                                                                 </Typography>
                                                             </div>
+
+                                                            <div className="grid grid-cols-2 gap-4 mb-4">
+                                                                <Typography variant="body2">
+                                                                    Date:{' '}
+                                                                    {new Date(
+                                                                        order.order_date,
+                                                                    ).toLocaleDateString()}
+                                                                </Typography>
+                                                                <Typography
+                                                                    variant="body2"
+                                                                    className="text-right">
+                                                                    Total: Rp{' '}
+                                                                    {parseInt(
+                                                                        order.total_amount,
+                                                                    ).toLocaleString()}
+                                                                </Typography>
+                                                            </div>
+
                                                             <Typography
-                                                                variant="body2"
-                                                                className="px-3 py-1 rounded-full"
-                                                                sx={{
-                                                                    backgroundColor:
-                                                                        'primary.main',
-                                                                    color:
-                                                                        'white',
-                                                                }}>
-                                                                {order.status}
+                                                                variant="subtitle1"
+                                                                gutterBottom
+                                                                sx={{ mt: 2 }}>
+                                                                Order Details:
                                                             </Typography>
-                                                        </div>
+                                                            <List>
+                                                                {order.order_details?.map(
+                                                                    detail => (
+                                                                        <ListItem
+                                                                            key={
+                                                                                detail.order_detail_id
+                                                                            }>
+                                                                            <ListItemText
+                                                                                primary={renderProductDetails(
+                                                                                    detail,
+                                                                                )}
+                                                                            />
+                                                                        </ListItem>
+                                                                    ),
+                                                                )}
+                                                            </List>
+                                                        </CardContent>
+                                                    </Card>
+                                                </Grid>
+                                            ))}
+                                        </Grid>
 
-                                                        <div className="grid grid-cols-2 gap-4 mb-4">
-                                                            <Typography variant="body2">
-                                                                Date:{' '}
-                                                                {new Date(
-                                                                    order.order_date,
-                                                                ).toLocaleDateString()}
-                                                            </Typography>
-                                                            <Typography
-                                                                variant="body2"
-                                                                className="text-right">
-                                                                Total: Rp{' '}
-                                                                {parseInt(
-                                                                    order.total_amount,
-                                                                ).toLocaleString()}
-                                                            </Typography>
-                                                        </div>
-
-                                                        <Typography
-                                                            variant="subtitle1"
-                                                            gutterBottom
-                                                            sx={{ mt: 2 }}>
-                                                            Order Details:
-                                                        </Typography>
-                                                        <List>
-                                                            {order.order_details?.map(
-                                                                detail => (
-                                                                    <ListItem
-                                                                        key={
-                                                                            detail.order_detail_id
-                                                                        }>
-                                                                        <ListItemText
-                                                                            primary={renderProductDetails(
-                                                                                detail,
-                                                                            )}
-                                                                        />
-                                                                    </ListItem>
-                                                                ),
-                                                            )}
-                                                        </List>
-                                                    </CardContent>
-                                                </Card>
-                                            </Grid>
-                                        ))}
-                                    </Grid>
-
-                                    {pagination && (
-                                        <Box
-                                            sx={{ mt: 3, textAlign: 'center' }}>
-                                            <Typography variant="body2">
-                                                Showing {pagination.from} to{' '}
-                                                {pagination.to} of{' '}
-                                                {pagination.total} entries
-                                            </Typography>
-                                        </Box>
-                                    )}
-                                </>
-                            )}
-                        </Container>
+                                        {pagination && (
+                                            <Box
+                                                sx={{
+                                                    mt: 3,
+                                                    textAlign: 'center',
+                                                }}>
+                                                <Typography variant="body2">
+                                                    Showing {pagination.from} to{' '}
+                                                    {pagination.to} of{' '}
+                                                    {pagination.total} entries
+                                                </Typography>
+                                            </Box>
+                                        )}
+                                    </>
+                                )}
+                            </Container>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     )
 }

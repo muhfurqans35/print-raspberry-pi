@@ -25,9 +25,9 @@ const Sidebar = () => {
     const menuItems = [
         { text: 'Dashboard', icon: <InboxIcon />, href: getDashboardUrl() },
         { text: 'Orders', icon: <MailIcon />, href: '/order/index' },
-        { text: 'Products', icon: <InboxIcon />, href: '/product' },
-        { text: 'Customers', icon: <MailIcon />, href: '/order' },
-        { text: 'Reports', icon: <InboxIcon />, href: '/order' },
+        { text: 'Items', icon: <InboxIcon />, href: '/product' },
+        { text: 'Printer', icon: <MailIcon />, href: '/printer' },
+        { text: 'Print', icon: <InboxIcon />, href: '/print' },
     ]
 
     const theme = useTheme()
