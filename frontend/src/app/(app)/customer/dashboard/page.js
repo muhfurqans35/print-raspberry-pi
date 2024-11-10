@@ -1,23 +1,19 @@
-"use client"
+'use client'
 
 import Header from '@/app/(app)/Header'
-import { useEffect } from 'react';
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/hooks/auth';
-
-// export const metadata = {
-//     title: 'Laravel - Dashboard',
-// }
+import { useAuth } from '@/hooks/auth'
 
 const Dashboard = () => {
-    const router = useRouter();
-    const { user, roles } = useAuth({ middleware: 'auth' });
+    const router = useRouter()
+    const { roles } = useAuth({ middleware: 'auth' })
 
     useEffect(() => {
         if (!roles.includes('customer')) {
-            router.push('/unauthorized'); // Redirect ke halaman unauthorized atau yang sesuai
+            router.push('/unauthorized')
         }
-    }, [roles]);
+    }, [roles])
     return (
         <>
             <Header title="Dashboard" />

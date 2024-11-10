@@ -11,13 +11,11 @@ import AuthSessionStatus from '@/app/(auth)/AuthSessionStatus'
 const Page = () => {
     const { roles, forgotPassword } = useAuth({
         middleware: 'guest',
-        redirectIfAuthenticated: (roles) => {
-            if (roles.includes('admin') ) {
+        redirectIfAuthenticated: roles => {
+            if (roles.includes('admin')) {
                 return '/admin/dashboard'
             } else if (roles.includes('customer')) {
                 return '/customer/dashboard'
-            } else if (roles.includes('service_owner') ) {
-                return '/service-owner/dashboard'
             } else {
                 return '/unauthorized'
             }

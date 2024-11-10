@@ -20,8 +20,6 @@ const Register = () => {
                 return '/admin/dashboard'
             } else if (roles.includes('customer')) {
                 return '/customer/dashboard'
-            } else if (roles.includes('service_owner')) {
-                return '/service-owner/dashboard'
             } else {
                 return '/unauthorized'
             }
@@ -55,7 +53,6 @@ const Register = () => {
             name,
             email,
             role,
-            company_name: role === 'service_owner' ? companyName : null,
             password,
             password_confirmation: passwordConfirmation,
             remember: shouldRemember,
@@ -120,43 +117,7 @@ const Register = () => {
                             Customer
                         </Label>
                     </div>
-                    <div className="flex items-center mt-2">
-                        <input
-                            id="role-service-owner"
-                            type="radio"
-                            name="role"
-                            value="service_owner"
-                            checked={role === 'service_owner'}
-                            onChange={event => setRole(event.target.value)}
-                            className="mr-2"
-                        />
-                        <Label
-                            htmlFor="role-service-owner"
-                            className="text-sm text-gray-600">
-                            Service Owner
-                        </Label>
-                    </div>
                 </div>
-
-                {/* Customer Owner Field */}
-                {role === 'service_owner' && (
-                    <div className="mt-4">
-                        <Label htmlFor="companyName">Company Name</Label>
-                        <Input
-                            id="companyName"
-                            type="text"
-                            value={companyName}
-                            onChange={event =>
-                                setCompanyName(event.target.value)
-                            }
-                            className="block mt-1 w-full"
-                        />
-                        <InputError
-                            messages={errors.company_name}
-                            className="mt-2"
-                        />
-                    </div>
-                )}
 
                 {/* Email Address */}
                 <div className="mt-4">
