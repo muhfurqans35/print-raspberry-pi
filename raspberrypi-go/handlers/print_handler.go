@@ -3,9 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"os/exec"
 	"strconv"
 )
@@ -35,13 +37,13 @@ func PrintHandler(w http.ResponseWriter, r *http.Request) {
 	encodedPath := url.QueryEscape(relativePath)
 
 	// URL untuk mengunduh file
-	url := fmt.Sprintf("http://192.168.1.15:3000/api/download?path=%s", encodedPath)
+	fileURL := fmt.Sprintf("http://192.168.1.15:8000/api/download?path=%s", encodedPath)
 
 	// Menyimpan file sementara di Raspberry Pi
 	tempFilePath := "/tmp/print_temp.pdf"
 
-	// Menjalankan perintah curl untuk mendownload file
-	err := downloadFileUsingCurl(url, tempFilePath)
+	// Download file menggunakan http.Get
+	err := downloadFile(fileURL, tempFilePath)
 	if err != nil {
 		http.Error(w, "Failed to download file: "+err.Error(), http.StatusInternalServerError)
 		log.Printf("Failed to download file: %v", err)
@@ -52,15 +54,32 @@ func PrintHandler(w http.ResponseWriter, r *http.Request) {
 	printFile(tempFilePath, request)
 }
 
-func downloadFileUsingCurl(fileURL string, destinationPath string) error {
-	// Membuat perintah curl untuk mendownload file
-	cmd := exec.Command("curl", "-L", fileURL, "--output", destinationPath)
-
-	// Menjalankan perintah curl
-	err := cmd.Run()
+func downloadFile(fileURL string, destinationPath string) error {
+	// Buat HTTP GET request
+	resp, err := http.Get(fileURL)
 	if err != nil {
-		return fmt.Errorf("failed to execute curl: %v", err)
+		return fmt.Errorf("failed to make HTTP request: %v", err)
 	}
+	defer resp.Body.Close()
+
+	// Periksa status code response
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bad status: %s", resp.Status)
+	}
+
+	// Buat file temporary
+	out, err := os.Create(destinationPath)
+	if err != nil {
+		return fmt.Errorf("failed to create file: %v", err)
+	}
+	defer out.Close()
+
+	// Copy isi response ke file
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to write file: %v", err)
+	}
+
 	return nil
 }
 
