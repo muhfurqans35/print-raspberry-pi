@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\Printer;
 use App\Models\PrintJob;
-use Illuminate\Support\Facades\Storage;
+
 
 class PrintRequestController extends Controller
 {
@@ -54,18 +54,12 @@ class PrintRequestController extends Controller
             // Persiapkan data untuk request API Go
             $dataToSend = [
                 'printer_name' => $printer->name,
-                'file_path' => $printJob->print_file_path,  // Pastikan file path yang dikirimkan dapat diakses oleh server Go
+                'file_path' => $printJob->print_file_path,
                 'copies' => (int)($printJob->copies ?? 1),
                 'paper_size' => $printJob->paper_size ?? 'A4',
                 'orientation' => $printJob->orientation ?? 'portrait',
                 'color_mode' => $printJob->color_mode ?? 'color',
             ];
-
-            // Log sebelum mengirim request
-            \Log::info('Sending print request to Go server', [
-                'file_path' => $filePathForGo,
-                'mime_type' => $mimeType,
-            ]);
 
             // Kirim request ke Go API server
             $response = Http::timeout(60)

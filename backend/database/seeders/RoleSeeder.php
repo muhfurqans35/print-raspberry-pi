@@ -20,6 +20,7 @@ class RoleSeeder extends Seeder
             'order_management',
             'service_management',
             'product_management',
+            'print_management',
         ];
         foreach ($permissions as $permission) {
             Permission::create(['name' => $permission]);
@@ -28,7 +29,6 @@ class RoleSeeder extends Seeder
         $superAdminRole = Role::create(['name' => 'super_admin']);
         $adminRole = Role::create(['name' => 'admin']);
         $customerRole = Role::create(['name' => 'customer']);
-        $serviceOwnerRole = Role::create(['name' => 'service_owner']);
 
         // Super Admin gets all permissions
         $superAdminRole->givePermissionTo(Permission::all());
@@ -38,9 +38,7 @@ class RoleSeeder extends Seeder
             'order_create_and_index',
             'service_management',
             'product_management',
-        ]);
-        $serviceOwnerRole->givePermissionTo([
-            'service_management', 'order_management', 'order_create_and_index', 'product_management',
+            'print_management',
         ]);
         $customerRole->givePermissionTo([
             'order_create_and_index',
@@ -49,7 +47,6 @@ class RoleSeeder extends Seeder
         $superAdmin = User::create([
             'name' => 'Muh Furqan Supriadi',
             'username' => 'muhfurqans35',
-            'company_name' => 'Super Admin Company',
             'email' => 'muhfurqans35@gmail.com',
             'email_verified_at' => now(),
             'password' => Hash::make('supriadi99'),
@@ -73,7 +70,6 @@ class RoleSeeder extends Seeder
         $admin = User::create([
             'name' => 'Admin',
             'username' => 'admin',
-            'company_name' => 'Admin Company',
             'email' => 'admin@admin.com',
             'email_verified_at' => now(),
             'password' => Hash::make('admin123'),

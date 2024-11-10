@@ -80,14 +80,16 @@ export default function OrderPage() {
     const [orderItems, setOrderItems] = useState([])
 
     const { submitOrder } = useOrder()
-    const { user } = useAuth()
     const router = useRouter()
+    const { roles } = useAuth({ middleware: 'auth' })
 
+    // roles check
     useEffect(() => {
-        if (!user) {
-            router.push('/login')
+        if (!roles.includes('customer')) {
+            router.push('/unauthorized')
         }
-    }, [user, router])
+    }, [roles])
+
     // Tab for Item and Print Job
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue)

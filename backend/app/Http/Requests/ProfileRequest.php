@@ -26,7 +26,6 @@ class ProfileRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->user_id . ',user_id'],
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'company_name' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
             'province' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:255',

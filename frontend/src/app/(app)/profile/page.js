@@ -21,7 +21,6 @@ const Profile = () => {
 
     const [name, setName] = useState(user?.name || '')
     const [email, setEmail] = useState(user?.email || '')
-    const [companyName, setCompanyName] = useState(user?.company_name || '')
     const [address, setAddress] = useState(user?.address || '')
     const [province, setProvince] = useState(user?.province || '')
     const [city, setCity] = useState(user?.city || '')
@@ -64,10 +63,6 @@ const Profile = () => {
         const formData = new FormData()
         formData.append('name', name)
         formData.append('email', email)
-        formData.append(
-            'company_name',
-            roles.includes('service_owner') ? companyName : null,
-        )
         formData.append('address', address)
         formData.append('province', province)
         formData.append('city', city)
@@ -94,7 +89,6 @@ const Profile = () => {
     const handleReset = () => {
         setName(user?.name || '')
         setEmail(user?.email || '')
-        setCompanyName(user?.company_name || '')
         setAddress(user?.address || '')
         setProvince(user?.province || '')
         setCity(user?.city || '')
@@ -191,23 +185,6 @@ const Profile = () => {
                                                     value={email}
                                                     onChange={e =>
                                                         setEmail(e.target.value)
-                                                    }
-                                                />
-                                            </Grid2>
-                                            <Grid2 xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="Company Name"
-                                                    value={companyName}
-                                                    onChange={e =>
-                                                        setCompanyName(
-                                                            e.target.value,
-                                                        )
-                                                    }
-                                                    disabled={
-                                                        !roles.includes(
-                                                            'service_owner',
-                                                        )
                                                     }
                                                 />
                                             </Grid2>

@@ -20,8 +20,6 @@ const Login = () => {
                 return '/admin/dashboard'
             } else if (roles.includes('customer')) {
                 return '/customer/dashboard'
-            } else if (roles.includes('service_owner')) {
-                return '/service-owner/dashboard'
             } else if (roles.includes('super_admin')) {
                 return '/super-admin/dashboard'
             } else {

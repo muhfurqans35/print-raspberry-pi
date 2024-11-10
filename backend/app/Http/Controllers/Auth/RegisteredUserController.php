@@ -21,8 +21,7 @@ class RegisteredUserController extends Controller
             'username' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|confirmed|min:8',
-            'role' => 'required|string|in:customer,service_owner,admin,super_admin',
-            'company_name' => $request->role === 'service_owner' ? 'required|string|max:255' : 'nullable'
+            'role' => 'required|string|in:customer,admin,super_admin',
         ]);
 
         $user = User::create([
@@ -30,7 +29,6 @@ class RegisteredUserController extends Controller
             'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'company_name' => $request->role === 'service_owner' ? $request->company_name : null,
         ]);
 
         $user->assignRole($request->role);
