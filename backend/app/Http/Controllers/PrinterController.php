@@ -24,7 +24,6 @@ class PrinterController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'print_job_id' => 'nullable|exists:print_jobs,print_job_id',
         ]);
 
         $printer = Printer::create($request->all());

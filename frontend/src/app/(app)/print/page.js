@@ -86,59 +86,59 @@ const PrintPage = () => {
                                     sx={{ mb: 2 }}>
                                     Select Print Job
                                 </Typography>
-                                <Paper sx={{ mb: 3 }}>
-                                    <List>
-                                        {printJobs.map(job => (
-                                            <ListItem
-                                                button
-                                                key={job.print_job_id}
-                                                selected={
+                                {/* <Paper sx={{ mb: 3 }}>
+                                    
+                                </Paper> */}
+                                <List>
+                                    {printJobs.map(job => (
+                                        <ListItem
+                                            button
+                                            key={job.print_job_id}
+                                            selected={
+                                                selectedPrintJob ===
+                                                job.print_job_id
+                                            }
+                                            onClick={() =>
+                                                setSelectedPrintJob(
+                                                    job.print_job_id,
+                                                )
+                                            }
+                                            sx={{
+                                                border:
                                                     selectedPrintJob ===
                                                     job.print_job_id
-                                                }
-                                                onClick={() =>
-                                                    setSelectedPrintJob(
-                                                        job.print_job_id,
-                                                    )
-                                                }
-                                                sx={{
-                                                    border:
+                                                        ? '2px solid #3f51b5'
+                                                        : '1px solid #ddd',
+                                                padding: '8px',
+                                                borderRadius: '8px',
+                                                backgroundColor:
+                                                    selectedPrintJob ===
+                                                    job.print_job_id
+                                                        ? '#e3f2fd'
+                                                        : 'transparent',
+                                                '&:hover': {
+                                                    backgroundColor: '#f5f5f5',
+                                                },
+                                            }}>
+                                            <ListItemText
+                                                primary={`File: ${job.print_file_path
+                                                    .split('/')
+                                                    .pop()}`}
+                                                secondary={`Copies: ${job.number_of_copies}, Orientation: ${job.orientation}, Paper Size: ${job.paper_size}, Color Type: ${job.color_type}`}
+                                            />
+                                            {/* Optional Checkbox for Print Job */}
+                                            <ListItemIcon>
+                                                <Checkbox
+                                                    checked={
                                                         selectedPrintJob ===
                                                         job.print_job_id
-                                                            ? '2px solid #3f51b5'
-                                                            : '1px solid #ddd',
-                                                    padding: '8px',
-                                                    borderRadius: '8px',
-                                                    backgroundColor:
-                                                        selectedPrintJob ===
-                                                        job.print_job_id
-                                                            ? '#e3f2fd'
-                                                            : 'transparent',
-                                                    '&:hover': {
-                                                        backgroundColor:
-                                                            '#f5f5f5',
-                                                    },
-                                                }}>
-                                                <ListItemText
-                                                    primary={`File: ${job.print_file_path
-                                                        .split('/')
-                                                        .pop()}`}
-                                                    secondary={`Copies: ${job.number_of_copies}, Orientation: ${job.orientation}, Paper Size: ${job.paper_size}, Color Type: ${job.color_type}`}
+                                                    }
+                                                    color="primary"
                                                 />
-                                                {/* Optional Checkbox for Print Job */}
-                                                <ListItemIcon>
-                                                    <Checkbox
-                                                        checked={
-                                                            selectedPrintJob ===
-                                                            job.print_job_id
-                                                        }
-                                                        color="primary"
-                                                    />
-                                                </ListItemIcon>
-                                            </ListItem>
-                                        ))}
-                                    </List>
-                                </Paper>
+                                            </ListItemIcon>
+                                        </ListItem>
+                                    ))}
+                                </List>
 
                                 <FormControl fullWidth sx={{ mb: 2 }}>
                                     <InputLabel>Select Printer</InputLabel>

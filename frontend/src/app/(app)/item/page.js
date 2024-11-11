@@ -160,9 +160,9 @@ const Item = () => {
                                                     variant="body1"
                                                     mt={1}>
                                                     Price: Rp.
-                                                    {Number(
-                                                        item.price.toLocaleString(),
-                                                    )}
+                                                    {parseInt(
+                                                        item.price,
+                                                    ).toLocaleString()}
                                                 </Typography>
                                                 <Typography variant="body1">
                                                     Stock: {item.stock_quantity}
@@ -234,7 +234,7 @@ const Item = () => {
                                             label="Price"
                                             name="price"
                                             type="number"
-                                            value={newItem.price}
+                                            value={Number(newItem.price)}
                                             onChange={handleInputChange}
                                             required
                                         />
@@ -248,27 +248,32 @@ const Item = () => {
                                             onChange={handleInputChange}
                                             required
                                         />
-                                        <Button
-                                            variant="contained"
-                                            component="label"
-                                            sx={{ mt: 2 }}>
-                                            Upload Image
-                                            <input
-                                                type="file"
-                                                hidden
-                                                onChange={handleImageChange}
-                                                required={!isEditing}
-                                            />
-                                        </Button>
-                                        <Button
-                                            type="submit"
-                                            variant="contained"
-                                            color="primary"
-                                            sx={{ mt: 2 }}>
-                                            {isEditing
-                                                ? 'Update Item'
-                                                : 'Add Item'}
-                                        </Button>
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                mt: 2,
+                                            }}>
+                                            <Button
+                                                variant="contained"
+                                                component="label">
+                                                Upload Image
+                                                <input
+                                                    type="file"
+                                                    hidden
+                                                    onChange={handleImageChange}
+                                                    required={!isEditing}
+                                                />
+                                            </Button>
+                                            <Button
+                                                type="submit"
+                                                variant="contained"
+                                                color="primary">
+                                                {isEditing
+                                                    ? 'Update Item'
+                                                    : 'Add Item'}
+                                            </Button>
+                                        </Box>
                                     </form>
                                 </Box>
                             </Modal>

@@ -11,7 +11,7 @@ class Printer extends Model
 
     protected $primaryKey = 'printer_id'; // Menentukan primary key
 
-    protected $fillable = ['name', 'print_job_id'];
+    protected $fillable = ['name'];
 
     public function printJobs()
     {

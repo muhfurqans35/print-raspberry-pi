@@ -102,7 +102,7 @@ export default function OrderPage() {
                                 <div className="space-y-1">
                                     <div>Quantity: {detail.quantity}</div>
                                     <div>
-                                        Price: Rp{' '}
+                                        Price: Rp.{' '}
                                         {parseInt(
                                             detail.price,
                                         ).toLocaleString()}
@@ -189,13 +189,13 @@ export default function OrderPage() {
                                 <div className="space-y-1">
                                     <div>Quantity: {detail.quantity}</div>
                                     <div>
-                                        Price: Rp{' '}
+                                        Price: Rp.{' '}
                                         {parseInt(
                                             detail.price,
                                         ).toLocaleString()}
                                     </div>
                                     <div>
-                                        Total Price: Rp{' '}
+                                        Total Price: Rp.{' '}
                                         {parseInt(
                                             detail.total_price,
                                         ).toLocaleString()}
@@ -333,7 +333,7 @@ export default function OrderPage() {
                                                                 <Typography
                                                                     variant="body2"
                                                                     className="text-right">
-                                                                    Total: Rp{' '}
+                                                                    Total: Rp.{' '}
                                                                     {parseInt(
                                                                         order.total_amount,
                                                                     ).toLocaleString()}
