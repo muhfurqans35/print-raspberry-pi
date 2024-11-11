@@ -1,13 +1,18 @@
 'use client'
 import { useAuth } from '@/hooks/auth'
-import Navigation from '@/app/(app)/Navigation'
-import Sidebar from '@/app/(app)/Sidebar'
-import { Box, Toolbar } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import Loading from '@/app/(app)/Loading'
+import * as React from 'react'
+import { alpha } from '@mui/material/styles'
+import CssBaseline from '@mui/material/CssBaseline'
+import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
+import AppNavbar from '@/components/AppNavbar'
 
-const AppLayout = ({ children }) => {
+import SideMenu from '@/components/SideMenu'
+
+const AppLayout = ({ children, props }) => {
     const { loading, user } = useAuth({ middleware: 'auth' })
     const router = useRouter()
 
@@ -23,21 +28,29 @@ const AppLayout = ({ children }) => {
 
     return (
         <>
+            <CssBaseline enableColorScheme />
             <Box sx={{ display: 'flex' }}>
-                <Sidebar />
-
-                {/* Main content */}
+                <SideMenu user={user} />
+                <AppNavbar user={user} />
 
                 <Box
                     component="main"
-                    sx={{ flexGrow: 1, bgcolor: 'background.default', p: 0 }}>
-                    <div className="min-h-screen bg-gray-100">
-                        {/* Navigation Bar */}
-                        <Navigation user={user} />
-
-                        {/* Main Content */}
-                        <main>{children}</main>
-                    </div>
+                    sx={theme => ({
+                        flexGrow: 1,
+                        backgroundColor: theme.vars
+                            ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
+                            : alpha(theme.palette.background.default, 1),
+                        overflow: 'auto',
+                    })}>
+                    <Stack
+                        spacing={2}
+                        sx={{
+                            alignItems: 'center',
+                            mx: 3,
+                            pb: 0,
+                            mt: { xs: 8, md: 0 },
+                        }}></Stack>
+                    <main>{children}</main>
                 </Box>
             </Box>
         </>

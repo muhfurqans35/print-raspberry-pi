@@ -3,13 +3,7 @@
 import Header from '@/app/(app)/Header'
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/auth'
-import {
-    CardContent,
-    Grid2,
-    TextField,
-    Button,
-    Typography,
-} from '@mui/material'
+import { CardContent, Grid, TextField, Button, Typography } from '@mui/material'
 import AuthSessionStatus from '@/app/(auth)/AuthSessionStatus'
 
 const Profile = () => {
@@ -45,8 +39,8 @@ const Profile = () => {
             const reader = new FileReader()
 
             reader.onloadend = () => {
-                setImage(reader.result) // Show preview image
-                setFileInput(file) // Set file input for upload
+                setImage(reader.result)
+                setFileInput(file)
             }
 
             reader.readAsDataURL(file)
@@ -68,7 +62,7 @@ const Profile = () => {
         formData.append('phone', phone)
 
         if (fileInput) {
-            formData.append('image', fileInput) // Append raw file here
+            formData.append('image', fileInput)
         }
 
         formData.append('password', password)
@@ -106,7 +100,7 @@ const Profile = () => {
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 bg-white border-b border-gray-200">
-                            <CardContent className="mbe-5">
+                            <CardContent>
                                 <AuthSessionStatus
                                     className="mb-4"
                                     status={status}
@@ -134,7 +128,13 @@ const Profile = () => {
                                                     component="label"
                                                     size="small"
                                                     variant="contained"
-                                                    htmlFor="account-settings-upload-image">
+                                                    htmlFor="account-settings-upload-image"
+                                                    sx={{
+                                                        width: {
+                                                            xs: '100%',
+                                                            sm: 'auto',
+                                                        },
+                                                    }}>
                                                     Upload New Photo
                                                     <input
                                                         hidden
@@ -151,120 +151,95 @@ const Profile = () => {
                                                     size="small"
                                                     variant="outlined"
                                                     color="error"
-                                                    onClick={handleReset}>
+                                                    onClick={handleReset}
+                                                    sx={{
+                                                        width: {
+                                                            xs: '100%',
+                                                            sm: 'auto',
+                                                        },
+                                                    }}>
                                                     Reset
                                                 </Button>
                                             </div>
                                             <Typography>
-                                                Allowed JPG, GIF or PNG. Max
-                                                size of 800K
+                                                Allowed JPG, GIF, or PNG. Max
+                                                size of 800K.
                                             </Typography>
                                         </div>
                                     </div>
 
                                     <CardContent>
-                                        <Grid2 container spacing={5}>
-                                            <Grid2 xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="Name"
-                                                    value={name}
-                                                    onChange={e =>
-                                                        setName(e.target.value)
-                                                    }
-                                                />
-                                            </Grid2>
-                                            <Grid2 xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="Email"
-                                                    value={email}
-                                                    onChange={e =>
-                                                        setEmail(e.target.value)
-                                                    }
-                                                />
-                                            </Grid2>
-                                            <Grid2 xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="Address"
-                                                    value={address}
-                                                    onChange={e =>
-                                                        setAddress(
-                                                            e.target.value,
-                                                        )
-                                                    }
-                                                />
-                                            </Grid2>
-                                            <Grid2 xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="Province"
-                                                    value={province}
-                                                    onChange={e =>
-                                                        setProvince(
-                                                            e.target.value,
-                                                        )
-                                                    }
-                                                />
-                                            </Grid2>
-                                            <Grid2 xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="City"
-                                                    value={city}
-                                                    onChange={e =>
-                                                        setCity(e.target.value)
-                                                    }
-                                                />
-                                            </Grid2>
-                                            <Grid2 xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="District"
-                                                    value={district}
-                                                    onChange={e =>
-                                                        setDistrict(
-                                                            e.target.value,
-                                                        )
-                                                    }
-                                                />
-                                            </Grid2>
-                                            <Grid2 xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="Subdistrict"
-                                                    value={subdistrict}
-                                                    onChange={e =>
-                                                        setSubdistrict(
-                                                            e.target.value,
-                                                        )
-                                                    }
-                                                />
-                                            </Grid2>
-                                            <Grid2 xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="Postcode"
-                                                    value={postcode}
-                                                    onChange={e =>
-                                                        setPostcode(
-                                                            e.target.value,
-                                                        )
-                                                    }
-                                                />
-                                            </Grid2>
-                                            <Grid2 xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="Phone"
-                                                    value={phone}
-                                                    onChange={e =>
-                                                        setPhone(e.target.value)
-                                                    }
-                                                />
-                                            </Grid2>
-                                            <Grid2 xs={12} sm={6}>
+                                        <Grid container spacing={2}>
+                                            {[
+                                                {
+                                                    label: 'Name',
+                                                    value: name,
+                                                    setValue: setName,
+                                                },
+                                                {
+                                                    label: 'Email',
+                                                    value: email,
+                                                    setValue: setEmail,
+                                                },
+                                                {
+                                                    label: 'Address',
+                                                    value: address,
+                                                    setValue: setAddress,
+                                                },
+                                                {
+                                                    label: 'Province',
+                                                    value: province,
+                                                    setValue: setProvince,
+                                                },
+                                                {
+                                                    label: 'City',
+                                                    value: city,
+                                                    setValue: setCity,
+                                                },
+                                                {
+                                                    label: 'District',
+                                                    value: district,
+                                                    setValue: setDistrict,
+                                                },
+                                                {
+                                                    label: 'Subdistrict',
+                                                    value: subdistrict,
+                                                    setValue: setSubdistrict,
+                                                },
+                                                {
+                                                    label: 'Postcode',
+                                                    value: postcode,
+                                                    setValue: setPostcode,
+                                                },
+                                                {
+                                                    label: 'Phone',
+                                                    value: phone,
+                                                    setValue: setPhone,
+                                                },
+                                            ].map((field, index) => (
+                                                <Grid
+                                                    key={index}
+                                                    item
+                                                    xs={12}
+                                                    sm={6}>
+                                                    <TextField
+                                                        fullWidth
+                                                        label={field.label}
+                                                        value={field.value}
+                                                        onChange={e =>
+                                                            field.setValue(
+                                                                e.target.value,
+                                                            )
+                                                        }
+                                                        sx={{
+                                                            width: {
+                                                                xs: '100%',
+                                                            },
+                                                        }}
+                                                    />
+                                                </Grid>
+                                            ))}
+                                            <Grid item xs={12} sm={6}>
                                                 <TextField
                                                     fullWidth
                                                     type="password"
@@ -275,9 +250,12 @@ const Profile = () => {
                                                             e.target.value,
                                                         )
                                                     }
+                                                    sx={{
+                                                        width: { xs: '100%' },
+                                                    }}
                                                 />
-                                            </Grid2>
-                                            <Grid2 xs={12} sm={6}>
+                                            </Grid>
+                                            <Grid item xs={12} sm={6}>
                                                 <TextField
                                                     fullWidth
                                                     type="password"
@@ -288,30 +266,52 @@ const Profile = () => {
                                                             e.target.value,
                                                         )
                                                     }
+                                                    sx={{
+                                                        width: { xs: '100%' },
+                                                    }}
                                                 />
-                                            </Grid2>
-                                            <Grid2
+                                            </Grid>
+                                            <Grid
+                                                item
                                                 xs={12}
                                                 className="flex gap-4 flex-wrap">
                                                 <Button
                                                     variant="contained"
-                                                    type="submit">
+                                                    type="submit"
+                                                    sx={{
+                                                        width: {
+                                                            xs: '100%',
+                                                            sm: 'auto',
+                                                        },
+                                                    }}>
                                                     Save Changes
                                                 </Button>
                                                 <Button
                                                     variant="outlined"
                                                     color="secondary"
-                                                    onClick={handleReset}>
+                                                    onClick={handleReset}
+                                                    sx={{
+                                                        width: {
+                                                            xs: '100%',
+                                                            sm: 'auto',
+                                                        },
+                                                    }}>
                                                     Reset
                                                 </Button>
                                                 <Button
                                                     variant="outlined"
                                                     color="error"
-                                                    onClick={deleteProfile}>
+                                                    onClick={deleteProfile}
+                                                    sx={{
+                                                        width: {
+                                                            xs: '100%',
+                                                            sm: 'auto',
+                                                        },
+                                                    }}>
                                                     Delete Account
                                                 </Button>
-                                            </Grid2>
-                                        </Grid2>
+                                            </Grid>
+                                        </Grid>
                                     </CardContent>
                                 </form>
                             </CardContent>
