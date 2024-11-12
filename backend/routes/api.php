@@ -12,34 +12,29 @@ use App\Http\Controllers\PrintRequestController;
 
 Route::get('/user', [UserController::class, 'index'])->middleware(['auth:sanctum']);
 
-Route::middleware(['auth:sanctum', 'permission:order_create_and_index'])->group(function () {
+Route::middleware(['auth:sanctum', 'permission:order_create_and_index', 'verified'])->group(function () {
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
 
 });
 
-Route::middleware(['auth:sanctum', 'permission:order_management'])->group(function () {
+Route::middleware(['auth:sanctum', 'permission:order_management', 'verified'])->group(function () {
     Route::patch('/orders/{orderId}/status', [OrderController::class, 'updateStatus'])->name('order.status');
 });
 
-Route::middleware(['auth:sanctum', 'permission:print_management'])->group(function () {
+Route::middleware(['auth:sanctum', 'permission:print_management', 'verified'])->group(function () {
     // Route::get('/printindex', [ItemController::class, 'index']);
     Route::get('/printjobs', [PrintJobController::class, 'index']);
     Route::apiResource('printers', PrinterController::class);
     Route::post('/submitPrint', [PrintRequestController::class, 'submitPrint']);
 });
 
-Route::get('/preview', [FileController::class, 'preview'])->name('file.preview');
-Route::get('/download', [FileController::class, 'download'])->name('file.download');
-
-Route::middleware(['auth:sanctum', 'permission:product_management'])->group(function () {
-    // Route::get('/items', [ItemController::class, 'index']);
-    // Route::post('/items', [ItemController::class, 'store']);
-    // Route::get('/items/{id}', [ItemController::class, 'show']);
-    // Route::post('/items/{id}', [ItemController::class, 'update']);
-    // Route::delete('/items/{id}', [ItemController::class, 'destroy']);
+Route::middleware(['auth:sanctum', 'permission:product_management', 'verified'])->group(function () {
     Route::apiResource('items', ItemController::class);
 });
+
+Route::get('/preview', [FileController::class, 'preview'])->name('file.preview');
+Route::get('/download', [FileController::class, 'download'])->name('file.download');
 
 
 
