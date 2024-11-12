@@ -28,6 +28,7 @@ import {
 import { useAuth } from '@/hooks/auth'
 import { useRouter } from 'next/navigation'
 import ApplicationLogo2 from './ApplicationLogo2'
+import Link from 'next/link'
 
 const LandingPage = () => {
     const [mobileOpen, setMobileOpen] = useState(false)
@@ -102,10 +103,16 @@ const LandingPage = () => {
         <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
             <List>
                 {navItems.map(item => (
-                    <ListItem key={item.label} disablePadding>
-                        <ListItemButton sx={{ textAlign: 'center' }}>
-                            <ListItemText primary={item.label} />
-                        </ListItemButton>
+                    <ListItem disablePadding>
+                        <Link href={item.href} passHref>
+                            <ListItemButton
+                                key={item.label}
+                                sx={{ textAlign: 'center' }}
+                                component={Link}
+                                href={item.href}>
+                                <ListItemText primary={item.label} />
+                            </ListItemButton>
+                        </Link>
                     </ListItem>
                 ))}
                 {!user ? (
@@ -124,14 +131,17 @@ const LandingPage = () => {
                 ) : (
                     <>
                         <ListItem disablePadding>
-                            <ListItemButton sx={{ textAlign: 'center' }}>
+                            <ListItemButton onClick={handleProfile}>
                                 <ListItemText primary="Profile" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
-                            <ListItemButton
-                                sx={{ textAlign: 'center' }}
-                                onClick={logout}>
+                            <ListItemButton onClick={handleOrderIndex}>
+                                <ListItemText primary="My Orders" />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton onClick={logout}>
                                 <ListItemText primary="Logout" />
                             </ListItemButton>
                         </ListItem>
@@ -167,11 +177,17 @@ const LandingPage = () => {
                                     gap: 2,
                                 }}>
                                 {navItems.map(item => (
-                                    <Button
-                                        key={item.label}
-                                        sx={{ color: 'white' }}>
-                                        {item.label}
-                                    </Button>
+                                    <Link href={item.href} passHref>
+                                        <ListItemButton
+                                            key={item.label}
+                                            sx={{ textAlign: 'center' }}
+                                            component={Link}
+                                            href={item.href}>
+                                            <ListItemText
+                                                primary={item.label}
+                                            />
+                                        </ListItemButton>
+                                    </Link>
                                 ))}
 
                                 {/* Conditional rendering berdasarkan status login */}

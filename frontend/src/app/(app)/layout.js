@@ -20,9 +20,14 @@ const AppLayout = ({ children }) => {
         return <Loading />
     }
     return (
-        <Box sx={{ minHeight: '100vh', bgcolor: 'white', color: 'black' }}>
+        <Box
+            sx={{
+                minHeight: '100vh',
+                bgcolor: 'white',
+                color: 'black',
+            }}>
             <NavbarHero user={user} />
-            {children}
+            <div className="p-8">{children}</div>
         </Box>
     )
 }
