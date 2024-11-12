@@ -23,6 +23,8 @@ import {
     AccountCircle,
     Person,
     ExitToApp,
+    LocalGroceryStore,
+    SpaceDashboard,
 } from '@mui/icons-material'
 import { useAuth } from '@/hooks/auth'
 import { useRouter } from 'next/navigation'
@@ -91,19 +93,19 @@ const NavbarHero = () => {
                 <MenuItem
                     onClick={() => router.push(getDashboardUrl())}
                     sx={{ gap: 1 }}>
-                    <Person fontSize="small" />
+                    <SpaceDashboard fontSize="small" />
                     Dashboard
                 </MenuItem>
             )}
-
+            <MenuItem onClick={handleOrderIndex} sx={{ gap: 1 }}>
+                <LocalGroceryStore fontSize="small" />
+                My Orders
+            </MenuItem>
             <MenuItem onClick={handleProfile} sx={{ gap: 1 }}>
                 <Person fontSize="small" />
                 Profile
             </MenuItem>
-            <MenuItem onClick={handleOrderIndex} sx={{ gap: 1 }}>
-                <Person fontSize="small" />
-                My Orders
-            </MenuItem>
+
             <MenuItem onClick={logout} sx={{ gap: 1 }}>
                 <ExitToApp fontSize="small" />
                 Logout
