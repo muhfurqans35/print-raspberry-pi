@@ -19,7 +19,6 @@ import {
     useTheme,
 } from '@mui/material'
 import {
-    Print,
     Menu as MenuIcon,
     AccountCircle,
     Person,
@@ -30,12 +29,14 @@ import { useRouter } from 'next/navigation'
 import ApplicationLogo2 from './ApplicationLogo2'
 import Link from 'next/link'
 
-const LandingPage = () => {
+const NavbarHero = () => {
     const [mobileOpen, setMobileOpen] = useState(false)
     const [anchorEl, setAnchorEl] = useState(null)
     const theme = useTheme()
     const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-    const { user, logout } = useAuth({ middleware: 'guest' })
+    const { roles, user, logout, getDashboardUrl } = useAuth({
+        middleware: 'guest',
+    })
     const router = useRouter()
     const navItems = [
         { label: 'Home', href: '/' },
@@ -68,7 +69,10 @@ const LandingPage = () => {
     const handleProfile = () => {
         router.push('/profile')
     }
-
+    const isAdminOrSuperAdmin =
+        roles &&
+        Array.isArray(roles) &&
+        (roles.includes('admin') || roles.includes('super_admin'))
     // Menu untuk user yang sudah login
     const userMenu = (
         <Menu
@@ -83,6 +87,15 @@ const LandingPage = () => {
                 vertical: 'top',
                 horizontal: 'right',
             }}>
+            {isAdminOrSuperAdmin && (
+                <MenuItem
+                    onClick={() => router.push(getDashboardUrl())}
+                    sx={{ gap: 1 }}>
+                    <Person fontSize="small" />
+                    Dashboard
+                </MenuItem>
+            )}
+
             <MenuItem onClick={handleProfile} sx={{ gap: 1 }}>
                 <Person fontSize="small" />
                 Profile
@@ -131,6 +144,13 @@ const LandingPage = () => {
                 ) : (
                     <>
                         <ListItem disablePadding>
+                            <ListItemButton
+                                onClick={() => router.push(getDashboardUrl())}>
+                                <ListItemText primary="Dashboard" />
+                            </ListItemButton>
+                        </ListItem>
+
+                        <ListItem disablePadding>
                             <ListItemButton onClick={handleProfile}>
                                 <ListItemText primary="Profile" />
                             </ListItemButton>
@@ -177,17 +197,12 @@ const LandingPage = () => {
                                     gap: 2,
                                 }}>
                                 {navItems.map(item => (
-                                    <Link href={item.href} passHref>
-                                        <ListItemButton
-                                            key={item.label}
-                                            sx={{ textAlign: 'center' }}
-                                            component={Link}
-                                            href={item.href}>
-                                            <ListItemText
-                                                primary={item.label}
-                                            />
-                                        </ListItemButton>
-                                    </Link>
+                                    <ListItemButton
+                                        key={item.label}
+                                        sx={{ textAlign: 'center' }}
+                                        href={item.href}>
+                                        <ListItemText primary={item.label} />
+                                    </ListItemButton>
                                 ))}
 
                                 {/* Conditional rendering berdasarkan status login */}
@@ -285,4 +300,4 @@ const LandingPage = () => {
     )
 }
 
-export default LandingPage
+export default NavbarHero

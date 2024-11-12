@@ -10,9 +10,11 @@ import {
 } from '@mui/icons-material'
 import NavbarHero from '@/components/NavbarHero'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/hooks/auth'
 
 const LandingPage = () => {
     const router = useRouter()
+    const { user } = useAuth()
     const handleOrders = () => {
         router.push('/order/create')
     }
@@ -22,7 +24,7 @@ const LandingPage = () => {
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: 'black', color: 'white' }}>
             {/* Navbar */}
-            <NavbarHero />
+            <NavbarHero user={user} />
 
             {/* Hero Section */}
             <Box
