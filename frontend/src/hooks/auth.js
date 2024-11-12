@@ -161,21 +161,20 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     useEffect(() => {
         if (!loading) {
             if (middleware === 'guest' && redirectIfAuthenticated && user) {
-                router.push(redirectIfAuthenticated(user.roles))
+                router.push('/')
             }
             if (
                 window.location.pathname === '/verify-email' &&
                 user?.email_verified_at
             ) {
-                router.push(redirectIfAuthenticated(user.roles))
+                router.push('/')
             }
         }
     }, [loading, user, error])
 
     const getDashboardUrl = () => {
-        if (user?.roles.includes('admin')) return '/admin/dashboard'
-        if (user?.roles.includes('customer')) return '/customer/dashboard'
-        if (user?.roles.includes('super_admin')) return '/super-admin/dashboard'
+        if (user?.roles.includes('admin')) return '/dashboard/admin'
+        if (user?.roles.includes('super_admin')) return '/dashboard/super-admin'
     }
 
     return {

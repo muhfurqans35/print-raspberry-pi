@@ -26,7 +26,7 @@ import {
     Visibility as ViewIcon,
 } from '@mui/icons-material'
 import { useRouter } from 'next/navigation'
-import Header from '../../Header'
+
 export default function OrderPage() {
     const [filters, setFilters] = useState({
         status: 'all',
@@ -220,7 +220,6 @@ export default function OrderPage() {
 
     return (
         <>
-            <Header title="Order List" />
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">

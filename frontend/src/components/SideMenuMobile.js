@@ -12,7 +12,6 @@ import { useAuth } from '@/hooks/auth'
 import { useRouter } from 'next/navigation'
 
 function SideMenuMobile({ open, toggleDrawer, user }) {
-    const { logout } = useAuth()
     const router = useRouter()
     const handleRedirectProfile = () => {
         router.push('/profile')
@@ -37,8 +36,8 @@ function SideMenuMobile({ open, toggleDrawer, user }) {
                 <Stack
                     direction="row"
                     sx={{
-                        p: 2,
-                        pb: 2,
+                        p: 1,
+                        pb: 1,
                         gap: 0,
                     }}>
                     <Stack
@@ -47,15 +46,12 @@ function SideMenuMobile({ open, toggleDrawer, user }) {
                             gap: 0,
                             alignItems: 'center',
                             flexGrow: 1,
-                            p: 2,
-                            pb: 2,
+                            p: 1,
+                            pb: 1,
                             cursor: 'pointer',
                             transition: 'background-color 0.3s, transform 0.1s',
                             '&:hover': {
                                 backgroundColor: '#f0f4f8',
-                            },
-                            '&:active': {
-                                transform: 'scale(0.98)',
                             },
                         }}
                         onClick={handleRedirectProfile}>
@@ -67,7 +63,7 @@ function SideMenuMobile({ open, toggleDrawer, user }) {
                                     ? `/storage/${user.image}`
                                     : '/default-profile.jpg'
                             }
-                            sx={{ width: 24, height: 24 }}
+                            sx={{ width: 28, height: 28, mr: 2 }}
                         />
                         <Typography component="p" variant="h8">
                             {user?.name}
@@ -78,15 +74,6 @@ function SideMenuMobile({ open, toggleDrawer, user }) {
                 <Stack sx={{ flexGrow: 1 }}>
                     <MenuContent />
                     <Divider />
-                </Stack>
-                <Stack sx={{ p: 2 }}>
-                    <Button
-                        variant="outlined"
-                        fullWidth
-                        startIcon={<LogoutRoundedIcon />}
-                        onClick={logout}>
-                        Logout
-                    </Button>
                 </Stack>
             </Stack>
         </Drawer>

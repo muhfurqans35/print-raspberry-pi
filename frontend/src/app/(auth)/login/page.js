@@ -9,23 +9,13 @@ import { useAuth } from '@/hooks/auth'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import AuthSessionStatus from '@/app/(auth)/AuthSessionStatus'
-import Loading from '@/app/(app)/Loading'
+import Loading from '@/app/dashboard/Loading'
 const Login = () => {
     const router = useRouter()
 
     const { login } = useAuth({
         middleware: 'guest',
-        redirectIfAuthenticated: roles => {
-            if (roles.includes('admin')) {
-                return '/admin/dashboard'
-            } else if (roles.includes('customer')) {
-                return '/customer/dashboard'
-            } else if (roles.includes('super_admin')) {
-                return '/super-admin/dashboard'
-            } else {
-                return '/unauthorized'
-            }
-        },
+        redirectIfAuthenticated: '/',
     })
 
     const [identifier, setIdentifier] = useState('')

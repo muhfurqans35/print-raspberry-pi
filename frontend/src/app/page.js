@@ -1,156 +1,220 @@
 'use client'
 import React from 'react'
+import { Box, Button, Container, Typography } from '@mui/material'
 import {
-    Box,
-    Button,
-    Container,
-    Grid,
-    Typography,
-    AppBar,
-    Toolbar,
-    Card,
-    CardContent,
-} from '@mui/material'
-import { styled } from '@mui/system'
-import LoginLinks from './LoginLinks'
-import ApplicationLogo from '@/components/ApplicationLogo'
+    Print,
+    ArrowForward,
+    AccessTime,
+    CurrencyExchange,
+    AutoAwesome,
+} from '@mui/icons-material'
+import NavbarHero from '@/components/NavbarHero'
+import { useRouter } from 'next/navigation'
 
-const HeroSection = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#1976d2',
-    color: 'white',
-    height: '60vh',
-    textAlign: 'center',
-    padding: theme.spacing(4),
-    marginBottom: theme.spacing(4),
-}))
-
-const FeatureCard = styled(Card)(({ theme }) => ({
-    height: '100%',
-    textAlign: 'center',
-    backgroundColor: '#f5f5f5',
-}))
-
-const Home = () => {
+const LandingPage = () => {
+    const router = useRouter()
+    const handleOrders = () => {
+        router.push('/order/create')
+    }
+    const handleFAQ = () => {
+        router.push('/faq')
+    }
     return (
-        <>
+        <Box sx={{ minHeight: '100vh', bgcolor: 'black', color: 'white' }}>
             {/* Navbar */}
-            <AppBar position="static">
-                <Toolbar>
-                    <ApplicationLogo className="block h-10 w-auto fill-current text-gray-600" />
-                    <LoginLinks />
-                </Toolbar>
-            </AppBar>
+            <NavbarHero />
 
             {/* Hero Section */}
-            <HeroSection>
-                <Container maxWidth="md">
-                    <Typography variant="h3" gutterBottom>
-                        Solusi Cepat dan Praktis untuk Fotocopy Online!
-                    </Typography>
-                    <Typography variant="h6" paragraph>
-                        Pesan, cetak, dan kirim tanpa perlu antre. Layanan
-                        fotocopy dan cetak dokumen yang mudah dan terpercaya.
-                    </Typography>
-                    <Button variant="contained" color="secondary" size="large">
-                        Pesan Sekarang
-                    </Button>
+            <Box
+                sx={{
+                    minHeight: '100vh',
+                    pt: 8,
+                    display: 'flex',
+                    alignItems: 'center',
+                    position: 'relative',
+                }}>
+                <Container maxWidth="xl">
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: { xs: 'column', md: 'row' },
+                            alignItems: 'center',
+                            gap: 4,
+                        }}>
+                        {/* Left Content */}
+                        <Box
+                            sx={{
+                                flex: 1,
+                                textAlign: { xs: 'center', md: 'left' },
+                            }}>
+                            <Typography
+                                variant="h2"
+                                component="h1"
+                                gutterBottom>
+                                Solusi Cepat & Praktis
+                                <Box
+                                    component="span"
+                                    sx={{
+                                        color: 'rgb(56, 189, 248)',
+                                        display: 'block',
+                                    }}>
+                                    untuk Fotocopy!
+                                </Box>
+                            </Typography>
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    color: 'grey.400',
+                                    mb: 4,
+                                    maxWidth: 'xl',
+                                }}>
+                                Pesan, cetak, dan kirim tanpa perlu antre.
+                                Layanan fotocopy dan cetak dokumen yang mudah
+                                dan terpercaya.
+                            </Typography>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    gap: 2,
+                                    justifyContent: {
+                                        xs: 'center',
+                                        md: 'flex-start',
+                                    },
+                                }}>
+                                <Button
+                                    variant="contained"
+                                    sx={{
+                                        bgcolor: 'rgb(56, 189, 248)',
+                                        '&:hover': {
+                                            bgcolor: 'rgb(14, 165, 233)',
+                                        },
+                                    }}
+                                    endIcon={<ArrowForward />}
+                                    onClick={() => {
+                                        handleOrders
+                                    }}>
+                                    Mulai Sekarang
+                                </Button>
+                                <Button
+                                    variant="outlined"
+                                    sx={{
+                                        color: 'white',
+                                        borderColor: 'white',
+                                        '&:hover': {
+                                            borderColor: 'white',
+                                            bgcolor: 'rgba(255,255,255,0.1)',
+                                        },
+                                    }}
+                                    onClick={() => {
+                                        handleFAQ
+                                    }}>
+                                    Pelajari Lebih Lanjut
+                                </Button>
+                            </Box>
+                        </Box>
+
+                        {/* Right Content */}
+                        <Box
+                            sx={{
+                                flex: 1,
+                                display: 'flex',
+                                justifyContent: 'center',
+                            }}>
+                            <Box sx={{ position: 'relative' }}>
+                                <Box
+                                    sx={{
+                                        bgcolor: 'rgba(56, 189, 248, 0.2)',
+                                        width: 300,
+                                        height: 300,
+                                        borderRadius: '50%',
+                                        position: 'absolute',
+                                        top: -40,
+                                        right: -40,
+                                        filter: 'blur(40px)',
+                                    }}
+                                />
+                                <Box
+                                    sx={{
+                                        bgcolor: 'white',
+                                        p: 4,
+                                        borderRadius: 4,
+                                        boxShadow: 24,
+                                        position: 'relative',
+                                    }}>
+                                    <Print
+                                        sx={{
+                                            fontSize: 200,
+                                            color: 'rgb(56, 189, 248)',
+                                        }}
+                                    />
+                                </Box>
+                            </Box>
+                        </Box>
+                    </Box>
                 </Container>
-            </HeroSection>
+            </Box>
 
             {/* Features Section */}
-            <Container>
-                <Typography variant="h4" align="center" gutterBottom>
-                    Keunggulan Kami
-                </Typography>
-                <Typography variant="body1" align="center" paragraph>
-                    Kenapa memilih FotocopyOnline?
-                </Typography>
-                <Grid container spacing={4} sx={{ mt: 2 }}>
-                    <Grid item xs={12} md={4}>
-                        <FeatureCard>
-                            <CardContent>
-                                <Typography variant="h5" gutterBottom>
-                                    Cepat dan Praktis
-                                </Typography>
-                                <Typography>
-                                    Pesan dari mana saja dan kapan saja, kami
-                                    siap cetak dan kirim dokumen Anda dengan
-                                    cepat!
-                                </Typography>
-                            </CardContent>
-                        </FeatureCard>
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                        <FeatureCard>
-                            <CardContent>
-                                <Typography variant="h5" gutterBottom>
-                                    Harga Terjangkau
-                                </Typography>
-                                <Typography>
-                                    Dapatkan layanan cetak berkualitas tinggi
-                                    dengan harga yang ramah di kantong.
-                                </Typography>
-                            </CardContent>
-                        </FeatureCard>
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                        <FeatureCard>
-                            <CardContent>
-                                <Typography variant="h5" gutterBottom>
-                                    Kualitas Terbaik
-                                </Typography>
-                                <Typography>
-                                    Menggunakan material cetak premium untuk
-                                    hasil yang memuaskan dan tahan lama.
-                                </Typography>
-                            </CardContent>
-                        </FeatureCard>
-                    </Grid>
-                </Grid>
-            </Container>
-
-            {/* Call to Action */}
-            <Box
-                sx={{
-                    backgroundColor: '#1976d2',
-                    color: 'white',
-                    py: 6,
-                    mt: 8,
-                    textAlign: 'center',
-                }}>
-                <Container>
-                    <Typography variant="h4" gutterBottom>
-                        Siap Mulai?
-                    </Typography>
-                    <Typography variant="h6" paragraph>
-                        Mulai pengalaman fotocopy online yang cepat, praktis,
-                        dan terjangkau!
-                    </Typography>
-                    <Button variant="contained" color="secondary" size="large">
-                        Daftar Sekarang
-                    </Button>
+            <Box sx={{ bgcolor: 'white', color: 'black', py: 10 }}>
+                <Container maxWidth="xl">
+                    <Box
+                        sx={{
+                            display: 'grid',
+                            gridTemplateColumns: {
+                                xs: '1fr',
+                                md: 'repeat(3, 1fr)',
+                            },
+                            gap: 4,
+                        }}>
+                        <Box sx={{ p: 3, textAlign: 'center' }}>
+                            <AccessTime
+                                sx={{
+                                    fontSize: 48,
+                                    color: 'rgb(56, 189, 248)',
+                                }}
+                            />
+                            <Typography variant="h5" sx={{ mt: 2, mb: 1 }}>
+                                Cepat dan Praktis
+                            </Typography>
+                            <Typography color="text.secondary">
+                                Pesan dari mana saja dan kapan saja, kami siap
+                                cetak dan kirim dokumen Anda dengan cepat!
+                            </Typography>
+                        </Box>
+                        <Box sx={{ p: 3, textAlign: 'center' }}>
+                            <CurrencyExchange
+                                sx={{
+                                    fontSize: 48,
+                                    color: 'rgb(56, 189, 248)',
+                                }}
+                            />
+                            <Typography variant="h5" sx={{ mt: 2, mb: 1 }}>
+                                Harga Terjangkau
+                            </Typography>
+                            <Typography color="text.secondary">
+                                Dapatkan layanan cetak berkualitas tinggi dengan
+                                harga yang ramah di kantong.
+                            </Typography>
+                        </Box>
+                        <Box sx={{ p: 3, textAlign: 'center' }}>
+                            <AutoAwesome
+                                sx={{
+                                    fontSize: 48,
+                                    color: 'rgb(56, 189, 248)',
+                                }}
+                            />
+                            <Typography variant="h5" sx={{ mt: 2, mb: 1 }}>
+                                Hasil Sempurna
+                            </Typography>
+                            <Typography color="text.secondary">
+                                Kepuasan pelanggan adalah prioritas kami
+                            </Typography>
+                        </Box>
+                    </Box>
                 </Container>
             </Box>
-
-            {/* Footer */}
-            <Box
-                sx={{
-                    backgroundColor: '#333',
-                    color: 'white',
-                    py: 4,
-                    textAlign: 'center',
-                }}>
-                <Container>
-                    <Typography variant="body2">
-                        © 2023 FotocopyOnline. Semua Hak Dilindungi.
-                    </Typography>
-                </Container>
-            </Box>
-        </>
+        </Box>
     )
 }
 
-export default Home
+export default LandingPage

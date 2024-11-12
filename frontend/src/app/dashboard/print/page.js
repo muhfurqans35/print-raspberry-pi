@@ -14,7 +14,6 @@ import {
     MenuItem,
     Button,
     CircularProgress,
-    Paper,
     List,
     ListItem,
     ListItemIcon,

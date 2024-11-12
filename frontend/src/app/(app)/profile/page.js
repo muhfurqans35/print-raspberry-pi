@@ -1,6 +1,5 @@
 'use client'
 
-import Header from '@/app/(app)/Header'
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/auth'
 import { CardContent, Grid, TextField, Button, Typography } from '@mui/material'
@@ -94,8 +93,6 @@ const Profile = () => {
 
     return (
         <>
-            <Header title="Update Profile" />
-
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">

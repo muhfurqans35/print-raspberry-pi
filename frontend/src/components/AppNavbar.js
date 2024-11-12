@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useAuth } from '@/hooks/auth'
 import { styled } from '@mui/material/styles'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
@@ -11,7 +10,6 @@ import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded'
 import SideMenuMobile from '@/components/SideMenuMobile'
 import MenuButton from '@/components/MenuButton'
 import ApplicationLogo from '@/components/ApplicationLogo'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 const Toolbar = styled(MuiToolbar)({
@@ -31,8 +29,6 @@ const Toolbar = styled(MuiToolbar)({
 })
 
 export default function AppNavbar({ user }) {
-    const router = useRouter()
-    const { logout } = useAuth()
     const [open, setOpen] = useState(false)
 
     const toggleDrawer = newOpen => () => {

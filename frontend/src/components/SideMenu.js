@@ -10,6 +10,8 @@ import Typography from '@mui/material/Typography'
 import MenuContent from '@/components/MenuContent'
 import ApplicationLogo from './ApplicationLogo'
 import { Divider } from '@mui/material'
+import { useRouter } from 'next/navigation'
+import Button from '@mui/material/Button'
 
 const drawerWidth = 240
 
@@ -25,6 +27,10 @@ const Drawer = styled(MuiDrawer)({
 })
 
 export default function SideMenu({ user }) {
+    const router = useRouter()
+    const handleRedirectProfile = () => {
+        router.push('/profile')
+    }
     return (
         <Drawer
             variant="permanent"
@@ -39,39 +45,45 @@ export default function SideMenu({ user }) {
             </div>
             <Divider />
             <MenuContent />
-
-            <Stack
-                direction="row"
-                sx={{
-                    p: 2,
-                    gap: 1,
-                    alignItems: 'center',
-                    borderTop: '1px solid',
-                    borderColor: 'divider',
-                }}>
-                <Avatar
-                    sizes="small"
-                    alt="image"
-                    src={
-                        user?.image
-                            ? `/storage/${user.image}`
-                            : '/default-profile.jpg'
-                    }
-                    sx={{ width: 36, height: 36 }}
-                />
-                <Box sx={{ mr: 'auto' }}>
-                    <Typography
-                        variant="body2"
-                        sx={{ fontWeight: 500, lineHeight: '16px' }}>
-                        {user?.name}
-                    </Typography>
-                    <Typography
-                        variant="caption"
-                        sx={{ color: 'text.secondary' }}>
-                        {user?.email}
-                    </Typography>
-                </Box>
-            </Stack>
+            <Button onClick={handleRedirectProfile} fullWidth>
+                <Stack
+                    direction="row"
+                    sx={{
+                        p: 2,
+                        gap: 2, // Increase gap between elements
+                        alignItems: 'center',
+                        width: '100%', // Make sure it takes up full width
+                        borderTop: '1px solid',
+                        borderColor: 'divider',
+                        transition: 'background-color 0.3s, transform 0.1s',
+                        '&:hover': {
+                            backgroundColor: '#f0f4f8',
+                        },
+                    }}>
+                    <Avatar
+                        sizes="small"
+                        alt="image"
+                        src={
+                            user?.image
+                                ? `/storage/${user.image}`
+                                : '/default-profile.jpg'
+                        }
+                        sx={{ width: 40, height: 40 }} // Adjust size to match text
+                    />
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            mr: 'auto',
+                        }}>
+                        <Typography
+                            variant="body2"
+                            sx={{ fontSize: '12px', fontWeight: '500' }}>
+                            {user?.name}
+                        </Typography>
+                    </Box>
+                </Stack>
+            </Button>
         </Drawer>
     )
 }

@@ -26,7 +26,7 @@ import { useOrder } from '@/hooks/order'
 import { useAuth } from '@/hooks/auth'
 import { useRouter } from 'next/navigation'
 import useItems from '@/hooks/item'
-import Header from '../../Header'
+import Header from '../../../dashboard/Header'
 
 // Constants for form options
 const PAPER_SIZES = [
@@ -344,7 +344,6 @@ export default function OrderPage() {
 
     return (
         <>
-            <Header title="Silahkan Order" />
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
