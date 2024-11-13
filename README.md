@@ -24,10 +24,12 @@ A Print Job Management application using Laravel, PostgreSQL, Next.js, and Raspb
  **Customer Workflow**:
 - Customers can place a print job or item order.
 - Once ordered, the print job status is `new`.
+
 **Admin Workflow**:
 - Admin accepts the print job and changes the status to `accepted`.
 - Admin starts printing or packaging, changing the status to `printing` or `packaging`.
 - Once the print job is completed, the admin updates the status to `printed/pickup ready`.
+
 **Customer Pickup**:
 - After the customer picks up the print job, the status is updated to `finished`.
   
