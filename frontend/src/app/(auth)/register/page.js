@@ -13,19 +13,9 @@ import AuthSessionStatus from '@/app/(auth)/AuthSessionStatus'
 const Register = () => {
     const router = useRouter()
 
-    const { user, roles, register } = useAuth({
+    const { register } = useAuth({
         middleware: 'guest',
-        redirectIfAuthenticated: roles => {
-            if (roles.includes('admin')) {
-                return '/admin/dashboard'
-            } else if (roles.includes('customer')) {
-                return '/customer/dashboard'
-            } else if (roles.includes('super_admin')) {
-                return '/super-admin/dashboard'
-            } else {
-                return '/unauthorized'
-            }
-        },
+        redirectIfAuthenticated: '/',
     })
 
     const [username, setUsername] = useState('')
@@ -33,8 +23,7 @@ const Register = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [passwordConfirmation, setPasswordConfirmation] = useState('')
-    const [role, setRole] = useState('customer')
-    const [companyName, setCompanyName] = useState('')
+
     const [shouldRemember, setShouldRemember] = useState(false)
     const [errors, setErrors] = useState([])
     const [status, setStatus] = useState(null)
@@ -54,7 +43,6 @@ const Register = () => {
             username,
             name,
             email,
-            role,
             password,
             password_confirmation: passwordConfirmation,
             remember: shouldRemember,
@@ -98,27 +86,6 @@ const Register = () => {
                     />
 
                     <InputError messages={errors.username} className="mt-2" />
-                </div>
-                {/* Role Selection */}
-                <div className="mt-4">
-                    <Label>Role</Label>
-
-                    <div className="flex items-center mt-2">
-                        <input
-                            id="role-customer"
-                            type="radio"
-                            name="role"
-                            value="customer"
-                            checked={role === 'customer'}
-                            onChange={event => setRole(event.target.value)}
-                            className="mr-2"
-                        />
-                        <Label
-                            htmlFor="role-customer"
-                            className="text-sm text-gray-600">
-                            Customer
-                        </Label>
-                    </div>
                 </div>
 
                 {/* Email Address */}

@@ -2,7 +2,7 @@
 import { useAuth } from '@/hooks/auth'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import Loading from '@/app/dashboard/Loading'
+import Loading from '@/components/Loading'
 import * as React from 'react'
 import { alpha } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
@@ -12,7 +12,7 @@ import AppNavbar from '@/components/AppNavbar'
 
 import SideMenu from '@/components/SideMenu'
 
-const DashboardLayout = ({ children, props }) => {
+const DashboardLayout = ({ children }) => {
     const { loading, user } = useAuth({ middleware: 'auth' })
     const router = useRouter()
 

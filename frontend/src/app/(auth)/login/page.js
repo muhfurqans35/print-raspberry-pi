@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/auth'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import AuthSessionStatus from '@/app/(auth)/AuthSessionStatus'
-import Loading from '@/app/dashboard/Loading'
+import Loading from '@/components/Loading'
 const Login = () => {
     const router = useRouter()
 

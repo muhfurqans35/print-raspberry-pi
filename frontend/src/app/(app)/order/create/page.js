@@ -26,7 +26,6 @@ import { useOrder } from '@/hooks/order'
 import { useAuth } from '@/hooks/auth'
 import { useRouter } from 'next/navigation'
 import useItems from '@/hooks/item'
-import Header from '../../../dashboard/Header'
 
 // Constants for form options
 const PAPER_SIZES = [
@@ -81,7 +80,7 @@ export default function OrderPage() {
     const { items } = useItems()
     const [orderItems, setOrderItems] = useState([])
 
-    const { submitOrder } = useOrder()
+    const { loading, error, submitOrder } = useOrder()
     const router = useRouter()
     const { permissions } = useAuth()
 
@@ -349,364 +348,293 @@ export default function OrderPage() {
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 bg-white border-b border-gray-200">
                             <Container maxWidth="md">
-                                <Tabs
-                                    value={tabValue}
-                                    onChange={handleTabChange}
-                                    centered>
-                                    <Tab label="Order Item" />
-                                    <Tab label="Print Job" />
-                                </Tabs>
+                                {loading ? (
+                                    <CircularProgress />
+                                ) : error ? (
+                                    <Typography color="error">
+                                        {error}
+                                    </Typography>
+                                ) : (
+                                    <>
+                                        <Tabs
+                                            value={tabValue}
+                                            onChange={handleTabChange}
+                                            centered>
+                                            <Tab label="Order Item" />
+                                            <Tab label="Print Job" />
+                                        </Tabs>
 
-                                {/* Item Order Tab */}
-                                <Box hidden={tabValue !== 0} p={3}>
-                                    <Box>
-                                        {errorMessage && (
-                                            <Alert
-                                                severity="error"
-                                                sx={{ mb: 2 }}>
-                                                {errorMessage}
-                                            </Alert>
-                                        )}
+                                        {/* Item Order Tab */}
+                                        <Box hidden={tabValue !== 0} p={3}>
+                                            <Box>
+                                                {errorMessage && (
+                                                    <Alert
+                                                        severity="error"
+                                                        sx={{ mb: 2 }}>
+                                                        {errorMessage}
+                                                    </Alert>
+                                                )}
 
-                                        {successMessage && (
-                                            <Alert
-                                                severity="success"
-                                                sx={{ mb: 2 }}>
-                                                {successMessage}
-                                            </Alert>
-                                        )}
+                                                {successMessage && (
+                                                    <Alert
+                                                        severity="success"
+                                                        sx={{ mb: 2 }}>
+                                                        {successMessage}
+                                                    </Alert>
+                                                )}
 
-                                        {/* Order Summary */}
-                                        {orderItems.length > 0 && (
-                                            <Box
-                                                sx={{
-                                                    mb: 4,
-                                                    p: 2,
-                                                    border: '1px solid',
-                                                    borderColor: 'divider',
-                                                    borderRadius: 1,
-                                                }}>
-                                                <Typography
-                                                    variant="h6"
-                                                    gutterBottom>
-                                                    Order Summary
-                                                </Typography>
-                                                <Grid container spacing={2}>
-                                                    {orderItems.map(item => (
+                                                {/* Order Summary */}
+                                                {orderItems.length > 0 && (
+                                                    <Box
+                                                        sx={{
+                                                            mb: 4,
+                                                            p: 2,
+                                                            border: '1px solid',
+                                                            borderColor:
+                                                                'divider',
+                                                            borderRadius: 1,
+                                                        }}>
+                                                        <Typography
+                                                            variant="h6"
+                                                            gutterBottom>
+                                                            Order Summary
+                                                        </Typography>
+                                                        <Grid
+                                                            container
+                                                            spacing={2}>
+                                                            {orderItems.map(
+                                                                item => (
+                                                                    <Grid
+                                                                        item
+                                                                        xs={12}
+                                                                        key={
+                                                                            item.item_id
+                                                                        }>
+                                                                        <Box
+                                                                            display="flex"
+                                                                            alignItems="center"
+                                                                            justifyContent="space-between">
+                                                                            <Typography>
+                                                                                {
+                                                                                    item.name
+                                                                                }
+                                                                            </Typography>
+                                                                            <Box
+                                                                                display="flex"
+                                                                                alignItems="center"
+                                                                                gap={
+                                                                                    2
+                                                                                }>
+                                                                                <Button
+                                                                                    size="small"
+                                                                                    onClick={() =>
+                                                                                        updateQuantity(
+                                                                                            item.item_id,
+                                                                                            item.quantity -
+                                                                                                1,
+                                                                                            item.stock_quantity,
+                                                                                        )
+                                                                                    }>
+                                                                                    -
+                                                                                </Button>
+                                                                                <Typography>
+                                                                                    {
+                                                                                        item.quantity
+                                                                                    }
+                                                                                </Typography>
+                                                                                <Button
+                                                                                    size="small"
+                                                                                    onClick={() =>
+                                                                                        updateQuantity(
+                                                                                            item.item_id,
+                                                                                            item.quantity +
+                                                                                                1,
+                                                                                            item.stock_quantity,
+                                                                                        )
+                                                                                    }>
+                                                                                    +
+                                                                                </Button>
+                                                                                <Typography>
+                                                                                    Rp{' '}
+                                                                                    {Number(
+                                                                                        item.price *
+                                                                                            item.quantity,
+                                                                                    ).toLocaleString()}
+                                                                                </Typography>
+                                                                                <Button
+                                                                                    color="error"
+                                                                                    size="small"
+                                                                                    onClick={() =>
+                                                                                        removeFromOrder(
+                                                                                            item.item_id,
+                                                                                        )
+                                                                                    }>
+                                                                                    Remove
+                                                                                </Button>
+                                                                            </Box>
+                                                                        </Box>
+                                                                    </Grid>
+                                                                ),
+                                                            )}
+                                                        </Grid>
+
+                                                        {/* Right-aligned Submit Button */}
+                                                        <Box
+                                                            display="flex"
+                                                            justifyContent="flex-end"
+                                                            mt={2}>
+                                                            <Button
+                                                                variant="contained"
+                                                                color="primary"
+                                                                onClick={
+                                                                    handleSubmitItems
+                                                                }
+                                                                disabled={
+                                                                    isSubmitting
+                                                                }>
+                                                                {isSubmitting
+                                                                    ? 'Submitting...'
+                                                                    : 'Submit Order'}
+                                                            </Button>
+                                                        </Box>
+                                                    </Box>
+                                                )}
+
+                                                {/* Available Items */}
+                                                <Grid container spacing={3}>
+                                                    {items?.map(item => (
                                                         <Grid
                                                             item
                                                             xs={12}
-                                                            key={item.item_id}>
-                                                            <Box
-                                                                display="flex"
-                                                                alignItems="center"
-                                                                justifyContent="space-between">
-                                                                <Typography>
-                                                                    {item.name}
-                                                                </Typography>
-                                                                <Box
-                                                                    display="flex"
-                                                                    alignItems="center"
-                                                                    gap={2}>
-                                                                    <Button
-                                                                        size="small"
-                                                                        onClick={() =>
-                                                                            updateQuantity(
-                                                                                item.item_id,
-                                                                                item.quantity -
-                                                                                    1,
-                                                                                item.stock_quantity,
-                                                                            )
-                                                                        }>
-                                                                        -
-                                                                    </Button>
-                                                                    <Typography>
+                                                            sm={6}
+                                                            md={4}
+                                                            key={item.id}>
+                                                            <Card>
+                                                                <CardMedia
+                                                                    component="img"
+                                                                    image={`/storage/${item.image}`}
+                                                                    alt={
+                                                                        item.name
+                                                                    }
+                                                                    className="h-36 w-auto object-contain"
+                                                                />
+                                                                <CardContent>
+                                                                    <Typography
+                                                                        variant="h6"
+                                                                        gutterBottom>
                                                                         {
-                                                                            item.quantity
+                                                                            item.name
+                                                                        }
+                                                                    </Typography>
+                                                                    <Typography
+                                                                        variant="body2"
+                                                                        color="text.secondary"
+                                                                        paragraph>
+                                                                        {
+                                                                            item.description
+                                                                        }
+                                                                    </Typography>
+                                                                    <Typography
+                                                                        variant="subtitle1"
+                                                                        color="primary">
+                                                                        Rp.
+                                                                        {Number(
+                                                                            item.price.toLocaleString(),
+                                                                        )}
+                                                                    </Typography>
+                                                                    <Typography
+                                                                        variant="body2"
+                                                                        gutterBottom>
+                                                                        Stock:{' '}
+                                                                        {
+                                                                            item.stock_quantity
                                                                         }
                                                                     </Typography>
                                                                     <Button
-                                                                        size="small"
+                                                                        variant="contained"
+                                                                        fullWidth
+                                                                        disabled={
+                                                                            item.stock_quantity ===
+                                                                                0 ||
+                                                                            orderItems.some(
+                                                                                orderItem =>
+                                                                                    orderItem.id ===
+                                                                                        item.id &&
+                                                                                    orderItem.quantity >=
+                                                                                        item.stock_quantity,
+                                                                            )
+                                                                        }
                                                                         onClick={() =>
-                                                                            updateQuantity(
-                                                                                item.item_id,
-                                                                                item.quantity +
-                                                                                    1,
-                                                                                item.stock_quantity,
+                                                                            addToOrder(
+                                                                                item,
                                                                             )
                                                                         }>
-                                                                        +
+                                                                        Add to
+                                                                        Order
                                                                     </Button>
-                                                                    <Typography>
-                                                                        Rp{' '}
-                                                                        {Number(
-                                                                            item.price *
-                                                                                item.quantity,
-                                                                        ).toLocaleString()}
-                                                                    </Typography>
-                                                                    <Button
-                                                                        color="error"
-                                                                        size="small"
-                                                                        onClick={() =>
-                                                                            removeFromOrder(
-                                                                                item.item_id,
-                                                                            )
-                                                                        }>
-                                                                        Remove
-                                                                    </Button>
-                                                                </Box>
-                                                            </Box>
+                                                                </CardContent>
+                                                            </Card>
                                                         </Grid>
                                                     ))}
                                                 </Grid>
-
-                                                {/* Right-aligned Submit Button */}
-                                                <Box
-                                                    display="flex"
-                                                    justifyContent="flex-end"
-                                                    mt={2}>
-                                                    <Button
-                                                        variant="contained"
-                                                        color="primary"
-                                                        onClick={
-                                                            handleSubmitItems
-                                                        }
-                                                        disabled={isSubmitting}>
-                                                        {isSubmitting
-                                                            ? 'Submitting...'
-                                                            : 'Submit Order'}
-                                                    </Button>
-                                                </Box>
                                             </Box>
-                                        )}
+                                        </Box>
 
-                                        {/* Available Items */}
-                                        <Grid container spacing={3}>
-                                            {items?.map(item => (
-                                                <Grid
-                                                    item
-                                                    xs={12}
-                                                    sm={6}
-                                                    md={4}
-                                                    key={item.id}>
-                                                    <Card>
-                                                        <CardMedia
-                                                            component="img"
-                                                            image={`/storage/${item.image}`}
-                                                            alt={item.name}
-                                                            className="h-36 w-auto object-contain"
-                                                        />
-                                                        <CardContent>
-                                                            <Typography
-                                                                variant="h6"
-                                                                gutterBottom>
-                                                                {item.name}
-                                                            </Typography>
-                                                            <Typography
-                                                                variant="body2"
-                                                                color="text.secondary"
-                                                                paragraph>
-                                                                {
-                                                                    item.description
-                                                                }
-                                                            </Typography>
-                                                            <Typography
-                                                                variant="subtitle1"
-                                                                color="primary">
-                                                                Rp.
-                                                                {Number(
-                                                                    item.price.toLocaleString(),
-                                                                )}
-                                                            </Typography>
-                                                            <Typography
-                                                                variant="body2"
-                                                                gutterBottom>
-                                                                Stock:{' '}
-                                                                {
-                                                                    item.stock_quantity
-                                                                }
-                                                            </Typography>
-                                                            <Button
-                                                                variant="contained"
-                                                                fullWidth
-                                                                disabled={
-                                                                    item.stock_quantity ===
-                                                                        0 ||
-                                                                    orderItems.some(
-                                                                        orderItem =>
-                                                                            orderItem.id ===
-                                                                                item.id &&
-                                                                            orderItem.quantity >=
-                                                                                item.stock_quantity,
-                                                                    )
-                                                                }
-                                                                onClick={() =>
-                                                                    addToOrder(
-                                                                        item,
-                                                                    )
-                                                                }>
-                                                                Add to Order
-                                                            </Button>
-                                                        </CardContent>
-                                                    </Card>
-                                                </Grid>
-                                            ))}
-                                        </Grid>
-                                    </Box>
-                                </Box>
-
-                                {/* Print Job Tab */}
-                                <Box hidden={tabValue !== 1} p={3}>
-                                    <Grid container spacing={2}>
-                                        {/* Print Job Form Fields */}
-                                        {/* Paper Size */}
-                                        <Grid item xs={12} md={4}>
-                                            <FormControl fullWidth required>
-                                                <InputLabel>
-                                                    Paper Size
-                                                </InputLabel>
-                                                <Select
-                                                    name="paperSize"
-                                                    value={
-                                                        printJobOrder.paperSize
-                                                    }
-                                                    onChange={handleInputChange(
-                                                        setPrintJobOrder,
-                                                    )}>
-                                                    {PAPER_SIZES.map(size => (
-                                                        <MenuItem
-                                                            key={size.value}
-                                                            value={size.value}>
-                                                            {size.label}
-                                                        </MenuItem>
-                                                    ))}
-                                                </Select>
-                                            </FormControl>
-                                        </Grid>
-                                        {/* Color Type */}
-                                        <Grid item xs={12} md={4}>
-                                            <FormControl fullWidth required>
-                                                <InputLabel>
-                                                    Color Type
-                                                </InputLabel>
-                                                <Select
-                                                    name="colorType"
-                                                    value={
-                                                        printJobOrder.colorType
-                                                    }
-                                                    onChange={handleInputChange(
-                                                        setPrintJobOrder,
-                                                    )}>
-                                                    {COLOR_TYPES.map(type => (
-                                                        <MenuItem
-                                                            key={type.value}
-                                                            value={type.value}>
-                                                            {type.label}
-                                                        </MenuItem>
-                                                    ))}
-                                                </Select>
-                                            </FormControl>
-                                        </Grid>
-
-                                        {/* Orientation */}
-                                        <Grid item xs={12} md={4}>
-                                            <FormControl fullWidth required>
-                                                <InputLabel>
-                                                    Orientation
-                                                </InputLabel>
-                                                <Select
-                                                    name="orientation"
-                                                    value={
-                                                        printJobOrder.orientation
-                                                    }
-                                                    onChange={handleInputChange(
-                                                        setPrintJobOrder,
-                                                    )}>
-                                                    <MenuItem value="portrait">
-                                                        Portrait
-                                                    </MenuItem>
-                                                    <MenuItem value="landscape">
-                                                        Landscape
-                                                    </MenuItem>
-                                                </Select>
-                                            </FormControl>
-                                        </Grid>
-
-                                        {/* Number of Pages */}
-                                        <Grid item xs={12} md={6}>
-                                            <TextField
-                                                fullWidth
-                                                required
-                                                type="number"
-                                                label="Number of Pages"
-                                                name="numberOfPages"
-                                                value={
-                                                    printJobOrder.numberOfPages
-                                                }
-                                                onChange={handleInputChange(
-                                                    setPrintJobOrder,
-                                                )}
-                                                InputProps={{
-                                                    inputProps: { min: 1 },
-                                                }}
-                                            />
-                                        </Grid>
-
-                                        {/* Number of Copies */}
-                                        <Grid item xs={12} md={6}>
-                                            <TextField
-                                                fullWidth
-                                                required
-                                                type="number"
-                                                label="Number of Copies"
-                                                name="numberOfCopies"
-                                                value={
-                                                    printJobOrder.numberOfCopies
-                                                }
-                                                onChange={handleInputChange(
-                                                    setPrintJobOrder,
-                                                )}
-                                                InputProps={{
-                                                    inputProps: { min: 1 },
-                                                }}
-                                            />
-                                        </Grid>
-                                        {/* Cover Type Switch */}
-                                        <Grid item xs={12}>
-                                            <FormControlLabel
-                                                control={
-                                                    <Switch
-                                                        checked={hasCover}
-                                                        onChange={
-                                                            handleCoverTypeChange
-                                                        }
-                                                        name="hasCover"
-                                                    />
-                                                }
-                                                label="Include Cover"
-                                            />
-                                        </Grid>
-
-                                        {/* Cover Type and Color (conditional rendering) */}
-                                        {hasCover && (
-                                            <>
-                                                <Grid item xs={12} md={6}>
+                                        {/* Print Job Tab */}
+                                        <Box hidden={tabValue !== 1} p={3}>
+                                            <Grid container spacing={2}>
+                                                {/* Print Job Form Fields */}
+                                                {/* Paper Size */}
+                                                <Grid item xs={12} md={4}>
                                                     <FormControl
                                                         fullWidth
                                                         required>
                                                         <InputLabel>
-                                                            Cover Type
+                                                            Paper Size
                                                         </InputLabel>
                                                         <Select
-                                                            name="coverType"
+                                                            name="paperSize"
                                                             value={
-                                                                printJobOrder.coverType ||
-                                                                ''
+                                                                printJobOrder.paperSize
                                                             }
                                                             onChange={handleInputChange(
                                                                 setPrintJobOrder,
                                                             )}>
-                                                            {COVER_TYPES.map(
+                                                            {PAPER_SIZES.map(
+                                                                size => (
+                                                                    <MenuItem
+                                                                        key={
+                                                                            size.value
+                                                                        }
+                                                                        value={
+                                                                            size.value
+                                                                        }>
+                                                                        {
+                                                                            size.label
+                                                                        }
+                                                                    </MenuItem>
+                                                                ),
+                                                            )}
+                                                        </Select>
+                                                    </FormControl>
+                                                </Grid>
+                                                {/* Color Type */}
+                                                <Grid item xs={12} md={4}>
+                                                    <FormControl
+                                                        fullWidth
+                                                        required>
+                                                        <InputLabel>
+                                                            Color Type
+                                                        </InputLabel>
+                                                        <Select
+                                                            name="colorType"
+                                                            value={
+                                                                printJobOrder.colorType
+                                                            }
+                                                            onChange={handleInputChange(
+                                                                setPrintJobOrder,
+                                                            )}>
+                                                            {COLOR_TYPES.map(
                                                                 type => (
                                                                     <MenuItem
                                                                         key={
@@ -725,273 +653,445 @@ export default function OrderPage() {
                                                     </FormControl>
                                                 </Grid>
 
-                                                <Grid item xs={12} md={6}>
+                                                {/* Orientation */}
+                                                <Grid item xs={12} md={4}>
                                                     <FormControl
                                                         fullWidth
                                                         required>
                                                         <InputLabel>
-                                                            Cover Color
+                                                            Orientation
                                                         </InputLabel>
                                                         <Select
-                                                            name="coverColor"
+                                                            name="orientation"
                                                             value={
-                                                                printJobOrder.coverColor ||
-                                                                ''
+                                                                printJobOrder.orientation
                                                             }
                                                             onChange={handleInputChange(
                                                                 setPrintJobOrder,
                                                             )}>
-                                                            {COVER_COLORS.map(
-                                                                color => (
-                                                                    <MenuItem
-                                                                        key={
-                                                                            color.value
-                                                                        }
-                                                                        value={
-                                                                            color.value
-                                                                        }>
-                                                                        {
-                                                                            color.label
-                                                                        }
-                                                                    </MenuItem>
-                                                                ),
-                                                            )}
+                                                            <MenuItem value="portrait">
+                                                                Portrait
+                                                            </MenuItem>
+                                                            <MenuItem value="landscape">
+                                                                Landscape
+                                                            </MenuItem>
                                                         </Select>
                                                     </FormControl>
                                                 </Grid>
-                                            </>
-                                        )}
 
-                                        {/* CD Option */}
-                                        <Grid item xs={12} md={12}>
-                                            <FormControlLabel
-                                                control={
-                                                    <Switch
-                                                        name="cd"
-                                                        checked={
-                                                            printJobOrder.cd
+                                                {/* Number of Pages */}
+                                                <Grid item xs={12} md={6}>
+                                                    <TextField
+                                                        fullWidth
+                                                        required
+                                                        type="number"
+                                                        label="Number of Pages"
+                                                        name="numberOfPages"
+                                                        value={
+                                                            printJobOrder.numberOfPages
                                                         }
-                                                        onChange={
-                                                            handleSwitchChange
-                                                        }
+                                                        onChange={handleInputChange(
+                                                            setPrintJobOrder,
+                                                        )}
+                                                        InputProps={{
+                                                            inputProps: {
+                                                                min: 1,
+                                                            },
+                                                        }}
                                                     />
-                                                }
-                                                label="Include CD"
-                                            />
-                                        </Grid>
+                                                </Grid>
 
-                                        {/* File Uploads */}
-                                        <Grid item xs={12} md={6}>
-                                            <TextField
-                                                fullWidth
-                                                required
-                                                type="file"
-                                                label="Print File"
-                                                name="printFile"
-                                                onChange={handleFileChange(
-                                                    setPrintJobOrder,
+                                                {/* Number of Copies */}
+                                                <Grid item xs={12} md={6}>
+                                                    <TextField
+                                                        fullWidth
+                                                        required
+                                                        type="number"
+                                                        label="Number of Copies"
+                                                        name="numberOfCopies"
+                                                        value={
+                                                            printJobOrder.numberOfCopies
+                                                        }
+                                                        onChange={handleInputChange(
+                                                            setPrintJobOrder,
+                                                        )}
+                                                        InputProps={{
+                                                            inputProps: {
+                                                                min: 1,
+                                                            },
+                                                        }}
+                                                    />
+                                                </Grid>
+                                                {/* Cover Type Switch */}
+                                                <Grid item xs={12}>
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                checked={
+                                                                    hasCover
+                                                                }
+                                                                onChange={
+                                                                    handleCoverTypeChange
+                                                                }
+                                                                name="hasCover"
+                                                            />
+                                                        }
+                                                        label="Include Cover"
+                                                    />
+                                                </Grid>
+
+                                                {/* Cover Type and Color (conditional rendering) */}
+                                                {hasCover && (
+                                                    <>
+                                                        <Grid
+                                                            item
+                                                            xs={12}
+                                                            md={6}>
+                                                            <FormControl
+                                                                fullWidth
+                                                                required>
+                                                                <InputLabel>
+                                                                    Cover Type
+                                                                </InputLabel>
+                                                                <Select
+                                                                    name="coverType"
+                                                                    value={
+                                                                        printJobOrder.coverType ||
+                                                                        ''
+                                                                    }
+                                                                    onChange={handleInputChange(
+                                                                        setPrintJobOrder,
+                                                                    )}>
+                                                                    {COVER_TYPES.map(
+                                                                        type => (
+                                                                            <MenuItem
+                                                                                key={
+                                                                                    type.value
+                                                                                }
+                                                                                value={
+                                                                                    type.value
+                                                                                }>
+                                                                                {
+                                                                                    type.label
+                                                                                }
+                                                                            </MenuItem>
+                                                                        ),
+                                                                    )}
+                                                                </Select>
+                                                            </FormControl>
+                                                        </Grid>
+
+                                                        <Grid
+                                                            item
+                                                            xs={12}
+                                                            md={6}>
+                                                            <FormControl
+                                                                fullWidth
+                                                                required>
+                                                                <InputLabel>
+                                                                    Cover Color
+                                                                </InputLabel>
+                                                                <Select
+                                                                    name="coverColor"
+                                                                    value={
+                                                                        printJobOrder.coverColor ||
+                                                                        ''
+                                                                    }
+                                                                    onChange={handleInputChange(
+                                                                        setPrintJobOrder,
+                                                                    )}>
+                                                                    {COVER_COLORS.map(
+                                                                        color => (
+                                                                            <MenuItem
+                                                                                key={
+                                                                                    color.value
+                                                                                }
+                                                                                value={
+                                                                                    color.value
+                                                                                }>
+                                                                                {
+                                                                                    color.label
+                                                                                }
+                                                                            </MenuItem>
+                                                                        ),
+                                                                    )}
+                                                                </Select>
+                                                            </FormControl>
+                                                        </Grid>
+                                                    </>
                                                 )}
-                                                InputLabelProps={{
-                                                    shrink: true,
-                                                }}
-                                            />
-                                        </Grid>
 
-                                        {printJobOrder.cd && (
-                                            <Grid item xs={12} md={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    required
-                                                    type="file"
-                                                    label="CD File"
-                                                    name="cdFile"
-                                                    onChange={handleFileChange(
-                                                        setPrintJobOrder,
-                                                    )}
-                                                    InputLabelProps={{
-                                                        shrink: true,
-                                                    }}
-                                                />
-                                            </Grid>
-                                        )}
+                                                {/* CD Option */}
+                                                <Grid item xs={12} md={12}>
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                name="cd"
+                                                                checked={
+                                                                    printJobOrder.cd
+                                                                }
+                                                                onChange={
+                                                                    handleSwitchChange
+                                                                }
+                                                            />
+                                                        }
+                                                        label="Include CD"
+                                                    />
+                                                </Grid>
 
-                                        {/* Notes */}
-                                        <Grid item xs={12}>
-                                            <TextField
-                                                fullWidth
-                                                multiline
-                                                rows={4}
-                                                label="Notes"
-                                                name="notes"
-                                                value={printJobOrder.notes}
-                                                onChange={handleInputChange(
-                                                    setPrintJobOrder,
-                                                )}
-                                            />
-                                        </Grid>
+                                                {/* File Uploads */}
+                                                <Grid item xs={12} md={6}>
+                                                    <TextField
+                                                        fullWidth
+                                                        required
+                                                        type="file"
+                                                        label="Print File"
+                                                        name="printFile"
+                                                        onChange={handleFileChange(
+                                                            setPrintJobOrder,
+                                                        )}
+                                                        InputLabelProps={{
+                                                            shrink: true,
+                                                        }}
+                                                    />
+                                                </Grid>
 
-                                        <Grid item xs={12}>
-                                            <Box display="flex" gap={2}>
-                                                <Button
-                                                    variant="contained"
-                                                    color="primary"
-                                                    onClick={handleAddPrintJob}
-                                                    disabled={isSubmitting}
-                                                    fullWidth>
-                                                    Add Print Job
-                                                </Button>
-                                                <Button
-                                                    variant="contained"
-                                                    color="secondary"
-                                                    onClick={
-                                                        handleSubmitPrintJobs
-                                                    }
-                                                    disabled={
-                                                        isSubmitting ||
-                                                        printJobs.length === 0
-                                                    }
-                                                    fullWidth>
-                                                    {isSubmitting ? (
-                                                        <CircularProgress
-                                                            size={24}
+                                                {printJobOrder.cd && (
+                                                    <Grid item xs={12} md={6}>
+                                                        <TextField
+                                                            fullWidth
+                                                            required
+                                                            type="file"
+                                                            label="CD File"
+                                                            name="cdFile"
+                                                            onChange={handleFileChange(
+                                                                setPrintJobOrder,
+                                                            )}
+                                                            InputLabelProps={{
+                                                                shrink: true,
+                                                            }}
                                                         />
-                                                    ) : (
-                                                        'Submit All Print Jobs'
-                                                    )}
-                                                </Button>
-                                            </Box>
-                                        </Grid>
+                                                    </Grid>
+                                                )}
 
-                                        {/* Print Jobs List */}
-                                        {printJobs.length > 0 && (
-                                            <Grid item xs={12}>
-                                                <Typography
-                                                    variant="h6"
-                                                    gutterBottom>
-                                                    Added Print Jobs (
-                                                    {printJobs.length})
-                                                </Typography>
-                                                <Box>
-                                                    {printJobs.map(
-                                                        (job, index) => (
-                                                            <Box
-                                                                key={index}
-                                                                border={1}
-                                                                borderColor="grey.300"
-                                                                borderRadius={2}
-                                                                padding={2}
-                                                                marginBottom={2}
-                                                                boxShadow={1}>
-                                                                <Typography
-                                                                    variant="h6"
-                                                                    gutterBottom>
-                                                                    Print Job #
-                                                                    {index + 1}
-                                                                </Typography>
-                                                                <Divider
-                                                                    sx={{
-                                                                        marginBottom: 2,
-                                                                    }}
+                                                {/* Notes */}
+                                                <Grid item xs={12}>
+                                                    <TextField
+                                                        fullWidth
+                                                        multiline
+                                                        rows={4}
+                                                        label="Notes"
+                                                        name="notes"
+                                                        value={
+                                                            printJobOrder.notes
+                                                        }
+                                                        onChange={handleInputChange(
+                                                            setPrintJobOrder,
+                                                        )}
+                                                    />
+                                                </Grid>
+
+                                                <Grid item xs={12}>
+                                                    <Box display="flex" gap={2}>
+                                                        <Button
+                                                            variant="contained"
+                                                            color="primary"
+                                                            onClick={
+                                                                handleAddPrintJob
+                                                            }
+                                                            disabled={
+                                                                isSubmitting
+                                                            }
+                                                            fullWidth>
+                                                            Add Print Job
+                                                        </Button>
+                                                        <Button
+                                                            variant="contained"
+                                                            color="secondary"
+                                                            onClick={
+                                                                handleSubmitPrintJobs
+                                                            }
+                                                            disabled={
+                                                                isSubmitting ||
+                                                                printJobs.length ===
+                                                                    0
+                                                            }
+                                                            fullWidth>
+                                                            {isSubmitting ? (
+                                                                <CircularProgress
+                                                                    size={24}
                                                                 />
+                                                            ) : (
+                                                                'Submit All Print Jobs'
+                                                            )}
+                                                        </Button>
+                                                    </Box>
+                                                </Grid>
 
-                                                                <Grid
-                                                                    container
-                                                                    spacing={1}>
-                                                                    <Grid
-                                                                        item
-                                                                        xs={6}>
+                                                {/* Print Jobs List */}
+                                                {printJobs.length > 0 && (
+                                                    <Grid item xs={12}>
+                                                        <Typography
+                                                            variant="h6"
+                                                            gutterBottom>
+                                                            Added Print Jobs (
+                                                            {printJobs.length})
+                                                        </Typography>
+                                                        <Box>
+                                                            {printJobs.map(
+                                                                (
+                                                                    job,
+                                                                    index,
+                                                                ) => (
+                                                                    <Box
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                        border={
+                                                                            1
+                                                                        }
+                                                                        borderColor="grey.300"
+                                                                        borderRadius={
+                                                                            2
+                                                                        }
+                                                                        padding={
+                                                                            2
+                                                                        }
+                                                                        marginBottom={
+                                                                            2
+                                                                        }
+                                                                        boxShadow={
+                                                                            1
+                                                                        }>
                                                                         <Typography
-                                                                            variant="body2"
-                                                                            color="textSecondary">
-                                                                            Paper
-                                                                            Size:
+                                                                            variant="h6"
+                                                                            gutterBottom>
+                                                                            Print
+                                                                            Job
+                                                                            #
+                                                                            {index +
+                                                                                1}
                                                                         </Typography>
-                                                                        <Typography variant="body1">
-                                                                            {
-                                                                                job.paperSize
-                                                                            }
-                                                                        </Typography>
-                                                                    </Grid>
-                                                                    <Grid
-                                                                        item
-                                                                        xs={6}>
-                                                                        <Typography
-                                                                            variant="body2"
-                                                                            color="textSecondary">
-                                                                            Color
-                                                                            Type:
-                                                                        </Typography>
-                                                                        <Typography variant="body1">
-                                                                            {
-                                                                                job.colorType
-                                                                            }
-                                                                        </Typography>
-                                                                    </Grid>
-                                                                    <Grid
-                                                                        item
-                                                                        xs={6}>
-                                                                        <Typography
-                                                                            variant="body2"
-                                                                            color="textSecondary">
-                                                                            Copies:
-                                                                        </Typography>
-                                                                        <Typography variant="body1">
-                                                                            {
-                                                                                job.numberOfCopies
-                                                                            }
-                                                                        </Typography>
-                                                                    </Grid>
-                                                                    <Grid
-                                                                        item
-                                                                        xs={6}>
-                                                                        <Typography
-                                                                            variant="body2"
-                                                                            color="textSecondary">
-                                                                            Pages
-                                                                        </Typography>
-                                                                        <Typography variant="body1">
-                                                                            {
-                                                                                job.numberOfPages
-                                                                            }
-                                                                        </Typography>
-                                                                    </Grid>
-                                                                    <Grid
-                                                                        item
-                                                                        xs={6}>
-                                                                        <Typography
-                                                                            variant="body2"
-                                                                            color="textSecondary">
-                                                                            Orientation:
-                                                                        </Typography>
-                                                                        <Typography variant="body1">
-                                                                            {
-                                                                                job.orientation
-                                                                            }
-                                                                        </Typography>
-                                                                    </Grid>
-                                                                    <Grid
-                                                                        item
-                                                                        xs={6}>
-                                                                        <Typography
-                                                                            variant="body2"
-                                                                            color="textSecondary">
-                                                                            Notes:
-                                                                        </Typography>
-                                                                        <Typography variant="body1">
-                                                                            {
-                                                                                job.notes
-                                                                            }
-                                                                        </Typography>
-                                                                    </Grid>
-                                                                </Grid>
-                                                            </Box>
-                                                        ),
-                                                    )}
-                                                </Box>
+                                                                        <Divider
+                                                                            sx={{
+                                                                                marginBottom: 2,
+                                                                            }}
+                                                                        />
+
+                                                                        <Grid
+                                                                            container
+                                                                            spacing={
+                                                                                1
+                                                                            }>
+                                                                            <Grid
+                                                                                item
+                                                                                xs={
+                                                                                    6
+                                                                                }>
+                                                                                <Typography
+                                                                                    variant="body2"
+                                                                                    color="textSecondary">
+                                                                                    Paper
+                                                                                    Size:
+                                                                                </Typography>
+                                                                                <Typography variant="body1">
+                                                                                    {
+                                                                                        job.paperSize
+                                                                                    }
+                                                                                </Typography>
+                                                                            </Grid>
+                                                                            <Grid
+                                                                                item
+                                                                                xs={
+                                                                                    6
+                                                                                }>
+                                                                                <Typography
+                                                                                    variant="body2"
+                                                                                    color="textSecondary">
+                                                                                    Color
+                                                                                    Type:
+                                                                                </Typography>
+                                                                                <Typography variant="body1">
+                                                                                    {
+                                                                                        job.colorType
+                                                                                    }
+                                                                                </Typography>
+                                                                            </Grid>
+                                                                            <Grid
+                                                                                item
+                                                                                xs={
+                                                                                    6
+                                                                                }>
+                                                                                <Typography
+                                                                                    variant="body2"
+                                                                                    color="textSecondary">
+                                                                                    Copies:
+                                                                                </Typography>
+                                                                                <Typography variant="body1">
+                                                                                    {
+                                                                                        job.numberOfCopies
+                                                                                    }
+                                                                                </Typography>
+                                                                            </Grid>
+                                                                            <Grid
+                                                                                item
+                                                                                xs={
+                                                                                    6
+                                                                                }>
+                                                                                <Typography
+                                                                                    variant="body2"
+                                                                                    color="textSecondary">
+                                                                                    Pages
+                                                                                </Typography>
+                                                                                <Typography variant="body1">
+                                                                                    {
+                                                                                        job.numberOfPages
+                                                                                    }
+                                                                                </Typography>
+                                                                            </Grid>
+                                                                            <Grid
+                                                                                item
+                                                                                xs={
+                                                                                    6
+                                                                                }>
+                                                                                <Typography
+                                                                                    variant="body2"
+                                                                                    color="textSecondary">
+                                                                                    Orientation:
+                                                                                </Typography>
+                                                                                <Typography variant="body1">
+                                                                                    {
+                                                                                        job.orientation
+                                                                                    }
+                                                                                </Typography>
+                                                                            </Grid>
+                                                                            <Grid
+                                                                                item
+                                                                                xs={
+                                                                                    6
+                                                                                }>
+                                                                                <Typography
+                                                                                    variant="body2"
+                                                                                    color="textSecondary">
+                                                                                    Notes:
+                                                                                </Typography>
+                                                                                <Typography variant="body1">
+                                                                                    {
+                                                                                        job.notes
+                                                                                    }
+                                                                                </Typography>
+                                                                            </Grid>
+                                                                        </Grid>
+                                                                    </Box>
+                                                                ),
+                                                            )}
+                                                        </Box>
+                                                    </Grid>
+                                                )}
                                             </Grid>
-                                        )}
-                                    </Grid>
-                                </Box>
+                                        </Box>
+                                    </>
+                                )}
                             </Container>
                         </div>
                     </div>

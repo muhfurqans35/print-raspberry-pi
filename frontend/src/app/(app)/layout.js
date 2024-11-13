@@ -4,7 +4,7 @@ import NavbarHero from '@/components/NavbarHero'
 import { useAuth } from '@/hooks/auth'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import Loading from '@/app/dashboard/Loading'
+import Loading from '@/components/Loading'
 
 const AppLayout = ({ children }) => {
     const { loading, user } = useAuth({ middleware: 'auth' })

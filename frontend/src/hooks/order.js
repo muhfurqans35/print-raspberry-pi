@@ -65,6 +65,7 @@ export const useOrder = () => {
         errors,
         status,
         orders,
+        error,
         isLoading: !error && !orders,
         isSubmitting,
     }

@@ -113,22 +113,16 @@ const NavbarHero = () => {
         </Menu>
     )
 
-    // Drawer content untuk mobile
+    // Drawer content for mobile
     const drawer = (
         <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
             <List>
                 {navItems.map(item => (
-                    <ListItem disablePadding>
-                        <Link href={item.href} passHref>
-                            <ListItemButton
-                                key={item.label}
-                                sx={{ textAlign: 'center' }}
-                                component={Link}
-                                href={item.href}>
-                                <ListItemText primary={item.label} />
-                            </ListItemButton>
-                        </Link>
-                    </ListItem>
+                    <Link href={item.href} passHref key={item.label}>
+                        <ListItemButton sx={{ textAlign: 'center' }}>
+                            <ListItemText primary={item.label} />
+                        </ListItemButton>
+                    </Link>
                 ))}
                 {!user ? (
                     <ListItem disablePadding>
@@ -147,23 +141,29 @@ const NavbarHero = () => {
                     <>
                         <ListItem disablePadding>
                             <ListItemButton
-                                onClick={() => router.push(getDashboardUrl())}>
+                                onClick={() => router.push(getDashboardUrl())}
+                                sx={{ textAlign: 'center' }}>
                                 <ListItemText primary="Dashboard" />
                             </ListItemButton>
                         </ListItem>
-
                         <ListItem disablePadding>
-                            <ListItemButton onClick={handleProfile}>
+                            <ListItemButton
+                                onClick={() => router.push('/profile')}
+                                sx={{ textAlign: 'center' }}>
                                 <ListItemText primary="Profile" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
-                            <ListItemButton onClick={handleOrderIndex}>
+                            <ListItemButton
+                                onClick={() => router.push('/order/index')}
+                                sx={{ textAlign: 'center' }}>
                                 <ListItemText primary="My Orders" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
-                            <ListItemButton onClick={logout}>
+                            <ListItemButton
+                                onClick={logout}
+                                sx={{ textAlign: 'center' }}>
                                 <ListItemText primary="Logout" />
                             </ListItemButton>
                         </ListItem>
@@ -200,6 +200,7 @@ const NavbarHero = () => {
                                 }}>
                                 {navItems.map(item => (
                                     <ListItemButton
+                                        component="a"
                                         key={item.label}
                                         sx={{ textAlign: 'center' }}
                                         href={item.href}>

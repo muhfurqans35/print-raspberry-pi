@@ -18,7 +18,7 @@ import { useState, useEffect } from 'react'
 import { getOrder } from '@/hooks/getorder'
 import { useAuth } from '@/hooks/auth'
 import { useRouter } from 'next/navigation'
-import Header from '@/app/dashboard/Header'
+import Header from '@/components/Header'
 
 export default function OrderManagementPage() {
     const [filters, setFilters] = useState({
