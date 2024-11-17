@@ -181,6 +181,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         user: user?.user,
         roles: user?.roles,
         permissions: user?.permissions,
+        emailVerified: user?.user?.email_verified_at,
         loading: !user && !error,
         error: error,
         login,

@@ -38,6 +38,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'postcode',
         'phone',
         'image',
+        'longitude',
+        'latitude'
     ];
 
     /**

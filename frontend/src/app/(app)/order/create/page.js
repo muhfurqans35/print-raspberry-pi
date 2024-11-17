@@ -82,13 +82,16 @@ export default function OrderPage() {
 
     const { loading, error, submitOrder } = useOrder()
     const router = useRouter()
-    const { permissions } = useAuth()
+    const { permissions, emailVerified } = useAuth()
 
     useEffect(() => {
         if (!permissions.includes('order_create_and_index')) {
             router.push('/unauthorized')
         }
-    }, [permissions])
+        if (!emailVerified) {
+            router.push('/verify-email')
+        }
+    }, [permissions, emailVerified])
 
     // Tab for Item and Print Job
     const handleTabChange = (event, newValue) => {

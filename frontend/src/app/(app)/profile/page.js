@@ -164,7 +164,7 @@ const Profile = () => {
                                                                 <input
                                                                     hidden
                                                                     type="file"
-                                                                    accept="image/png, image/jpeg"
+                                                                    accept="image/png, image/jpeg, image/jpg"
                                                                     onChange={
                                                                         handleFileInputChange
                                                                     }

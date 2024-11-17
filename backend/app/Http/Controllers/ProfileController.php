@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileRequest;
@@ -14,10 +13,11 @@ class ProfileController extends Controller
     public function update(ProfileRequest $request): JsonResponse
     {
         $user = Auth::user();
+        $originalEmail = $user->email;
 
         try {
             // Update profile data first
-            $user->update([
+            $userData = [
                 'name' => $request->input('name'),
                 'email' => $request->input('email'),
                 'address' => $request->input('address'),
@@ -27,15 +27,23 @@ class ProfileController extends Controller
                 'subdistrict' => $request->input('subdistrict'),
                 'postcode' => $request->input('postcode'),
                 'phone' => $request->input('phone'),
-            ]);
+            ];
 
-            // Handle image upload
+            // If email is updated, set verified to null
+            if ($originalEmail !== $request->input('email')) {
+                $userData['email_verified_at'] = null;
+            }
+
+            // Update user data
+            $user->update($userData);
+
+            // Handle image upload if provided
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
 
-                // Validasi tipe file untuk memastikan hanya gambar yang diterima
-                if (!$file->isValid() || !in_array($file->extension(), ['jpg', 'jpeg', 'png', 'gif'])) {
-                    return response()->json(['error' => 'File harus berupa gambar dengan ekstensi jpg, jpeg, png, atau gif.'], 422);
+                // Validate image type
+                if (!$file->isValid() || !in_array($file->extension(), ['jpg', 'jpeg', 'png'])) {
+                    return response()->json(['error' => 'File harus berupa gambar dengan ekstensi jpg, jpeg, png'], 422);
                 }
 
                 // Delete old image if exists
@@ -43,12 +51,12 @@ class ProfileController extends Controller
                     Storage::disk('public')->delete($user->image);
                 }
 
-                // Store the new image with a unique filename
+                // Store new image with a unique filename
                 $imagePath = $file->storeAs('images', uniqid() . '.' . $file->extension(), 'public');
 
                 Log::info('Image stored at path:', [$imagePath]);
 
-                // Save the image path to the user model
+                // Update the image path in user data
                 $user->update(['image' => $imagePath]);
             }
 

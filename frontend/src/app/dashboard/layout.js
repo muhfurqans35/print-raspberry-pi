@@ -17,10 +17,14 @@ const DashboardLayout = ({ children }) => {
     const router = useRouter()
 
     useEffect(() => {
-        if (!loading && !user) {
-            router.push('/login')
+        if (!loading) {
+            if (!user) {
+                router.push('/login')
+            } else if (!user.email_verified_at) {
+                router.push('/verify-email')
+            }
         }
-    }, [user, router, loading])
+    }, [user, loading, router])
 
     if (!user) {
         return <Loading />

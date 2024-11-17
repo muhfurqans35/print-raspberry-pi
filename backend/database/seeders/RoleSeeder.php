@@ -36,6 +36,7 @@ class RoleSeeder extends Seeder
             'order_create_and_index',
             'product_management',
             'print_management',
+            'user_management'
         ]);
         $customerRole->givePermissionTo([
             'order_create_and_index',

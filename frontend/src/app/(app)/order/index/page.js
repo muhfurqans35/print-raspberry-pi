@@ -41,14 +41,17 @@ export default function OrderPage() {
     const { data, isLoading, error } = getOrder(filters)
     const orders = data?.orders || []
     const pagination = data?.pagination
-    const { permissions } = useAuth()
     const router = useRouter()
+    const { permissions, emailVerified } = useAuth()
 
     useEffect(() => {
         if (!permissions.includes('order_create_and_index')) {
             router.push('/unauthorized')
         }
-    }, [permissions])
+        if (!emailVerified) {
+            router.push('/verify-email')
+        }
+    }, [permissions, emailVerified])
 
     const statusOptions = [
         'all',
