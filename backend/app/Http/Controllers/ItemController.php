@@ -9,10 +9,10 @@ use Illuminate\Support\Facades\Storage;
 class ItemController extends Controller
 {
 
-    public function __construct()
-    {
-        $this->middleware('auth'); // Middleware untuk memastikan pengguna terautentikasi
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth');
+    // }
     public function index()
     {
         return response()->json(Item::all(), 200);

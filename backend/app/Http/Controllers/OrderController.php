@@ -13,10 +13,10 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-    public function __construct()
-    {
-        // $this->middleware(['auth:sanctum']);
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware(['auth:sanctum']);
+    // }
     public function store(OrderRequest $request)
     {
         DB::beginTransaction();
@@ -32,7 +32,6 @@ class OrderController extends Controller
                 'total_amount' => 0, // Di-update nanti setelah semua total harga dikalkulasi
                 'status' => 'new',
             ]);
-            \Log::info('Order created', ['order_id' => $order->order_id]);
             if ($request->has('items')) {
             foreach ($request->items as $itemData) {
                 $itemId = $itemData['item_id'] ?? null;
@@ -51,7 +50,7 @@ class OrderController extends Controller
                         'price' => $price,
                         'total_price' => $totalPrice,
                     ]);
-                    \Log::info('OrderDetail for item created', ['order_id' => $order->order_id, 'item_id' => $item->item_id]);
+
                     $totalAmount += $totalPrice;
                     }
                 }

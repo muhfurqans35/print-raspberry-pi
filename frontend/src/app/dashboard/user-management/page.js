@@ -26,10 +26,11 @@ import {
     Edit as EditIcon,
     Delete as DeleteIcon,
     Add as AddIcon,
-    Refresh as RefreshIcon,
 } from '@mui/icons-material'
 import { useUserManagement } from '@/hooks/user-management'
-
+import { useAuth } from '@/hooks/auth'
+import { useRouter } from 'next/navigation'
+import Header from '@/components/Header'
 const UserManagement = () => {
     const {
         users,
@@ -39,6 +40,8 @@ const UserManagement = () => {
         updateUser,
         deleteUser,
     } = useUserManagement()
+    const { permissions, roles } = useAuth()
+    const router = useRouter()
     const [openModal, setOpenModal] = useState(false)
     const [selectedUser, setSelectedUser] = useState(null)
     const [formError, setFormError] = useState(null)
@@ -61,7 +64,11 @@ const UserManagement = () => {
         message: '',
         severity: 'success',
     })
-
+    useEffect(() => {
+        if (!permissions.includes('user_management')) {
+            router.push('/unauthorized')
+        }
+    }, [permissions])
     const resetForm = () => {
         setFormData({
             name: '',
@@ -114,8 +121,15 @@ const UserManagement = () => {
         const isUpdating = Boolean(selectedUser)
         const userData = new FormData()
 
+        // Tambahkan _method di sini untuk menggantikan metode PUT
+        if (isUpdating) {
+            userData.append('_method', 'PUT')
+        }
+
+        // Menambahkan data form ke FormData
         Object.entries(formData).forEach(([key, value]) => {
             if (key === 'image' && !value) return // Skip image if null
+            if (key === 'image' && value === selectedUser?.image) return // Skip if image is the same as before
             userData.append(key, value)
         })
 
@@ -130,8 +144,18 @@ const UserManagement = () => {
                 `${isUpdating ? 'User updated' : 'User created'} successfully`,
             )
         } catch (err) {
-            setFormError(err.message)
-            showNotification(err.message, 'error')
+            // Check if the error has a response and data with a message
+            if (
+                err.response &&
+                err.response.data &&
+                err.response.data.message
+            ) {
+                setFormError(err.response.data.message) // Use the specific error message
+                showNotification(err.response.data.message, 'error')
+            } else {
+                setFormError(err.message) // Fallback to the generic error message
+                showNotification(err.message, 'error')
+            }
         }
     }
 
@@ -151,273 +175,448 @@ const UserManagement = () => {
     }
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                mb={3}>
-                <Typography variant="h4">User Management</Typography>
-                <Box>
-                    <Button
-                        variant="contained"
-                        startIcon={<AddIcon />}
-                        onClick={() => handleModalOpen()}>
-                        Add User
-                    </Button>
-                </Box>
-            </Box>
+        <>
+            <Header title="User Management" />
+            <div className="py-12 px-4 sm:px-8 lg:px-16">
+                <div className="max-w-7xl mx-auto">
+                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div className="p-6 bg-white border-b border-gray-200">
+                            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+                                {isLoading ? (
+                                    <CircularProgress />
+                                ) : (
+                                    <>
+                                        <Box
+                                            display="flex"
+                                            justifyContent="space-between"
+                                            alignItems="center"
+                                            mb={3}>
+                                            {roles.includes('super_admin') && (
+                                                <Box>
+                                                    <Button
+                                                        variant="contained"
+                                                        startIcon={<AddIcon />}
+                                                        onClick={() =>
+                                                            handleModalOpen()
+                                                        }>
+                                                        Add User
+                                                    </Button>
+                                                </Box>
+                                            )}
+                                        </Box>
 
-            {isLoading ? (
-                <Box display="flex" justifyContent="center" p={3}>
-                    <CircularProgress />
-                </Box>
-            ) : (
-                <TableContainer component={Paper}>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Email</TableCell>
-                                <TableCell>Phone</TableCell>
-                                <TableCell>Address</TableCell>
-                                <TableCell>Actions</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {users.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={5} align="center">
-                                        No users found
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                users.map(user => (
-                                    <TableRow key={user.user_id}>
-                                        <TableCell>{user.name}</TableCell>
-                                        <TableCell>{user.email}</TableCell>
-                                        <TableCell>{user.phone}</TableCell>
-                                        <TableCell>{user.address}</TableCell>
-                                        <TableCell>
-                                            <IconButton
-                                                onClick={() =>
-                                                    handleModalOpen(user)
-                                                }>
-                                                <EditIcon />
-                                            </IconButton>
-                                            <IconButton
-                                                onClick={() =>
-                                                    handleDelete(user.user_id)
-                                                }>
-                                                <DeleteIcon />
-                                            </IconButton>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            )}
+                                        {isLoading ? (
+                                            <Box
+                                                display="flex"
+                                                justifyContent="center"
+                                                p={3}>
+                                                <CircularProgress />
+                                            </Box>
+                                        ) : (
+                                            <TableContainer component={Paper}>
+                                                <Table>
+                                                    <TableHead>
+                                                        <TableRow>
+                                                            <TableCell>
+                                                                Name
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                Email
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                Phone
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                Address
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                Actions
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    </TableHead>
+                                                    <TableBody>
+                                                        {users.length === 0 ? (
+                                                            <TableRow>
+                                                                <TableCell
+                                                                    colSpan={5}
+                                                                    align="center">
+                                                                    No users
+                                                                    found
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ) : (
+                                                            users.map(user => (
+                                                                <TableRow
+                                                                    key={
+                                                                        user.user_id
+                                                                    }>
+                                                                    <TableCell>
+                                                                        {
+                                                                            user.name
+                                                                        }
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        {
+                                                                            user.email
+                                                                        }
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        {
+                                                                            user.phone
+                                                                        }
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        {
+                                                                            user.address
+                                                                        }
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        <IconButton
+                                                                            onClick={() =>
+                                                                                handleModalOpen(
+                                                                                    user,
+                                                                                )
+                                                                            }>
+                                                                            <EditIcon />
+                                                                        </IconButton>
+                                                                        <IconButton
+                                                                            onClick={() =>
+                                                                                handleDelete(
+                                                                                    user.user_id,
+                                                                                )
+                                                                            }>
+                                                                            <DeleteIcon />
+                                                                        </IconButton>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            ))
+                                                        )}
+                                                    </TableBody>
+                                                </Table>
+                                            </TableContainer>
+                                        )}
 
-            <Dialog
-                open={openModal}
-                onClose={handleModalClose}
-                maxWidth="md"
-                fullWidth>
-                <DialogTitle>
-                    {selectedUser ? 'Edit User' : 'Create New User'}
-                </DialogTitle>
-                <DialogContent>
-                    <Box
-                        component="form"
-                        onSubmit={handleSubmit}
-                        sx={{ mt: 2 }}>
-                        {formError && (
-                            <Alert severity="error" sx={{ mb: 2 }}>
-                                {formError}
-                            </Alert>
-                        )}
+                                        <Dialog
+                                            open={openModal}
+                                            onClose={handleModalClose}
+                                            maxWidth="md"
+                                            fullWidth>
+                                            <DialogTitle>
+                                                {selectedUser
+                                                    ? 'Edit User'
+                                                    : 'Create New User'}
+                                            </DialogTitle>
+                                            <DialogContent>
+                                                <Box
+                                                    component="form"
+                                                    onSubmit={handleSubmit}
+                                                    sx={{ mt: 2 }}
+                                                    encType="multipart/form-data">
+                                                    {formError && (
+                                                        <Alert
+                                                            severity="error"
+                                                            sx={{ mb: 2 }}>
+                                                            {formError}
+                                                        </Alert>
+                                                    )}
 
-                        <Grid container spacing={2}>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth
-                                    label="Name"
-                                    name="name"
-                                    value={formData.name || ''}
-                                    onChange={handleChange}
-                                    required={!selectedUser}
-                                />
-                            </Grid>
+                                                    <Grid container spacing={2}>
+                                                        <Grid
+                                                            item
+                                                            xs={12}
+                                                            sm={6}>
+                                                            <TextField
+                                                                fullWidth
+                                                                label="Name"
+                                                                name="name"
+                                                                value={
+                                                                    formData.name ||
+                                                                    ''
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                required={
+                                                                    !selectedUser
+                                                                }
+                                                            />
+                                                        </Grid>
 
-                            {!selectedUser && (
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        fullWidth
-                                        label="Username"
-                                        name="username"
-                                        value={formData.username || ''}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </Grid>
-                            )}
+                                                        {!selectedUser && (
+                                                            <Grid
+                                                                item
+                                                                xs={12}
+                                                                sm={6}>
+                                                                <TextField
+                                                                    fullWidth
+                                                                    label="Username"
+                                                                    name="username"
+                                                                    value={
+                                                                        formData.username ||
+                                                                        ''
+                                                                    }
+                                                                    onChange={
+                                                                        handleChange
+                                                                    }
+                                                                    required
+                                                                />
+                                                            </Grid>
+                                                        )}
 
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth
-                                    label="Email"
-                                    name="email"
-                                    type="email"
-                                    value={formData.email || ''}
-                                    onChange={handleChange}
-                                    required={!selectedUser}
-                                />
-                            </Grid>
+                                                        <Grid
+                                                            item
+                                                            xs={12}
+                                                            sm={6}>
+                                                            <TextField
+                                                                fullWidth
+                                                                label="Email"
+                                                                name="email"
+                                                                type="email"
+                                                                value={
+                                                                    formData.email ||
+                                                                    ''
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                required={
+                                                                    !selectedUser
+                                                                }
+                                                            />
+                                                        </Grid>
 
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth
-                                    label="Password"
-                                    name="password"
-                                    type="password"
-                                    onChange={handleChange}
-                                    required={!selectedUser}
-                                />
-                            </Grid>
+                                                        <Grid
+                                                            item
+                                                            xs={12}
+                                                            sm={6}>
+                                                            <TextField
+                                                                fullWidth
+                                                                label="Password"
+                                                                name="password"
+                                                                type="password"
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                required={
+                                                                    !selectedUser
+                                                                }
+                                                            />
+                                                        </Grid>
 
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth
-                                    label="Phone"
-                                    name="phone"
-                                    value={formData.phone || ''}
-                                    onChange={handleChange}
-                                />
-                            </Grid>
+                                                        <Grid
+                                                            item
+                                                            xs={12}
+                                                            sm={6}>
+                                                            <TextField
+                                                                fullWidth
+                                                                label="Phone"
+                                                                name="phone"
+                                                                value={
+                                                                    formData.phone ||
+                                                                    ''
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                            />
+                                                        </Grid>
 
-                            <Grid item xs={12}>
-                                <TextField
-                                    fullWidth
-                                    label="Address"
-                                    name="address"
-                                    multiline
-                                    rows={3}
-                                    value={formData.address || ''}
-                                    onChange={handleChange}
-                                />
-                            </Grid>
+                                                        <Grid item xs={12}>
+                                                            <TextField
+                                                                fullWidth
+                                                                label="Address"
+                                                                name="address"
+                                                                multiline
+                                                                rows={3}
+                                                                value={
+                                                                    formData.address ||
+                                                                    ''
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                            />
+                                                        </Grid>
 
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth
-                                    label="Province"
-                                    name="province"
-                                    value={formData.province || ''}
-                                    onChange={handleChange}
-                                />
-                            </Grid>
+                                                        <Grid
+                                                            item
+                                                            xs={12}
+                                                            sm={6}>
+                                                            <TextField
+                                                                fullWidth
+                                                                label="Province"
+                                                                name="province"
+                                                                value={
+                                                                    formData.province ||
+                                                                    ''
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                            />
+                                                        </Grid>
 
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth
-                                    label="City"
-                                    name="city"
-                                    value={formData.city || ''}
-                                    onChange={handleChange}
-                                />
-                            </Grid>
+                                                        <Grid
+                                                            item
+                                                            xs={12}
+                                                            sm={6}>
+                                                            <TextField
+                                                                fullWidth
+                                                                label="City"
+                                                                name="city"
+                                                                value={
+                                                                    formData.city ||
+                                                                    ''
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                            />
+                                                        </Grid>
 
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth
-                                    label="District"
-                                    name="district"
-                                    value={formData.district || ''}
-                                    onChange={handleChange}
-                                />
-                            </Grid>
+                                                        <Grid
+                                                            item
+                                                            xs={12}
+                                                            sm={6}>
+                                                            <TextField
+                                                                fullWidth
+                                                                label="District"
+                                                                name="district"
+                                                                value={
+                                                                    formData.district ||
+                                                                    ''
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                            />
+                                                        </Grid>
 
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth
-                                    label="Subdistrict"
-                                    name="subdistrict"
-                                    value={formData.subdistrict || ''}
-                                    onChange={handleChange}
-                                />
-                            </Grid>
+                                                        <Grid
+                                                            item
+                                                            xs={12}
+                                                            sm={6}>
+                                                            <TextField
+                                                                fullWidth
+                                                                label="Subdistrict"
+                                                                name="subdistrict"
+                                                                value={
+                                                                    formData.subdistrict ||
+                                                                    ''
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                            />
+                                                        </Grid>
 
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth
-                                    label="Postcode"
-                                    name="postcode"
-                                    value={formData.postcode || ''}
-                                    onChange={handleChange}
-                                />
-                            </Grid>
+                                                        <Grid
+                                                            item
+                                                            xs={12}
+                                                            sm={6}>
+                                                            <TextField
+                                                                fullWidth
+                                                                label="Postcode"
+                                                                name="postcode"
+                                                                value={
+                                                                    formData.postcode ||
+                                                                    ''
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                            />
+                                                        </Grid>
 
-                            <Grid item xs={12}>
-                                <input
-                                    accept="image/*"
-                                    type="file"
-                                    name="image"
-                                    onChange={handleChange}
-                                    style={{ display: 'none' }}
-                                    id="image-upload"
-                                />
-                                <label htmlFor="image-upload">
-                                    <Button
-                                        variant="contained"
-                                        component="span">
-                                        Upload Image
-                                    </Button>
-                                </label>
-                                {formData.image && (
-                                    <Typography
-                                        variant="caption"
-                                        sx={{ ml: 2 }}>
-                                        Selected: {formData.image.name}
-                                    </Typography>
+                                                        <Grid item xs={12}>
+                                                            <input
+                                                                accept="image/*"
+                                                                type="file"
+                                                                name="image"
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                style={{
+                                                                    display:
+                                                                        'none',
+                                                                }}
+                                                                id="image-upload"
+                                                            />
+                                                            <label htmlFor="image-upload">
+                                                                <Button
+                                                                    variant="contained"
+                                                                    component="span">
+                                                                    Upload Image
+                                                                </Button>
+                                                            </label>
+                                                            {formData.image && (
+                                                                <Typography
+                                                                    variant="caption"
+                                                                    sx={{
+                                                                        ml: 2,
+                                                                    }}>
+                                                                    Selected:{' '}
+                                                                    {
+                                                                        formData
+                                                                            .image
+                                                                            .name
+                                                                    }
+                                                                </Typography>
+                                                            )}
+                                                        </Grid>
+                                                    </Grid>
+
+                                                    <Box
+                                                        sx={{
+                                                            mt: 3,
+                                                            display: 'flex',
+                                                            justifyContent:
+                                                                'flex-end',
+                                                        }}>
+                                                        <Button
+                                                            onClick={
+                                                                handleModalClose
+                                                            }
+                                                            sx={{ mr: 1 }}>
+                                                            Cancel
+                                                        </Button>
+                                                        <Button
+                                                            type="submit"
+                                                            variant="contained"
+                                                            color="primary">
+                                                            {selectedUser
+                                                                ? 'Update'
+                                                                : 'Create'}{' '}
+                                                            User
+                                                        </Button>
+                                                    </Box>
+                                                </Box>
+                                            </DialogContent>
+                                        </Dialog>
+
+                                        <Snackbar
+                                            open={snackbar.open}
+                                            autoHideDuration={6000}
+                                            onClose={handleCloseSnackbar}
+                                            anchorOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}>
+                                            <Alert
+                                                onClose={handleCloseSnackbar}
+                                                severity={snackbar.severity}
+                                                sx={{ width: '100%' }}>
+                                                {snackbar.message}
+                                            </Alert>
+                                        </Snackbar>
+                                    </>
                                 )}
-                            </Grid>
-                        </Grid>
-
-                        <Box
-                            sx={{
-                                mt: 3,
-                                display: 'flex',
-                                justifyContent: 'flex-end',
-                            }}>
-                            <Button onClick={handleModalClose} sx={{ mr: 1 }}>
-                                Cancel
-                            </Button>
-                            <Button
-                                type="submit"
-                                variant="contained"
-                                color="primary">
-                                {selectedUser ? 'Update' : 'Create'} User
-                            </Button>
-                        </Box>
-                    </Box>
-                </DialogContent>
-            </Dialog>
-
-            <Snackbar
-                open={snackbar.open}
-                autoHideDuration={6000}
-                onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
-                <Alert
-                    onClose={handleCloseSnackbar}
-                    severity={snackbar.severity}
-                    sx={{ width: '100%' }}>
-                    {snackbar.message}
-                </Alert>
-            </Snackbar>
-        </Container>
+                            </Container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
     )
 }
 

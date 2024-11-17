@@ -46,6 +46,7 @@ class UserManagementController extends Controller
 
     public function update(UserManagementUpdateRequest $request, $id)
     {
+
         $user = User::findOrFail($id);
 
         if (!Auth::user()->hasRole('super_admin') && !Auth::user()->hasRole('admin')) {

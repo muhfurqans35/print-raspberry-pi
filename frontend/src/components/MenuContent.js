@@ -13,7 +13,8 @@ import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard'
 import InventoryIcon from '@mui/icons-material/Inventory'
 import LogoutIcon from '@mui/icons-material/Logout'
 import AccountBoxIcon from '@mui/icons-material/AccountBox'
-import Link from 'next/link'
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts'
+
 import { useAuth } from '@/hooks/auth'
 
 export default function MenuContent() {
@@ -25,6 +26,11 @@ export default function MenuContent() {
             text: 'Dashboard',
             icon: <SpaceDashboardIcon />,
             href: getDashboardUrl(),
+        },
+        {
+            text: 'User Management',
+            icon: <ManageAccountsIcon />,
+            href: '/dashboard/user-management',
         },
         {
             text: 'Orders',

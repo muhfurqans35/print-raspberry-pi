@@ -4,7 +4,6 @@ import useSWR from 'swr'
 
 export const useUserManagement = () => {
     const [errors, setErrors] = useState([])
-
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     // Fetch data for users using SWR
@@ -31,12 +30,12 @@ export const useUserManagement = () => {
                 userData,
                 {
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'multipart/form-data',
                     },
                 },
             )
 
-            mutate(
+            await mutate(
                 currentUsers => [response.data, ...(currentUsers || [])],
                 false,
             )
@@ -44,6 +43,7 @@ export const useUserManagement = () => {
             return response.data
         } catch (error) {
             handleError(error)
+            throw error // Re-throw untuk handling di component
         } finally {
             setIsSubmitting(false)
         }
@@ -55,17 +55,18 @@ export const useUserManagement = () => {
         setErrors([])
 
         try {
-            const response = await axios.put(
+            // Gunakan POST dengan _method=PUT
+            const response = await axios.post(
                 `/api/usermanagements/${id}`,
                 updatedData,
                 {
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'multipart/form-data',
                     },
                 },
             )
 
-            mutate(currentUsers => {
+            await mutate(currentUsers => {
                 return currentUsers.map(user =>
                     user.user_id === id ? response.data : user,
                 )
@@ -74,6 +75,7 @@ export const useUserManagement = () => {
             return response.data
         } catch (error) {
             handleError(error)
+            throw error // Re-throw untuk handling di component
         } finally {
             setIsSubmitting(false)
         }
@@ -87,13 +89,14 @@ export const useUserManagement = () => {
         try {
             await axios.delete(`/api/usermanagements/${id}`)
 
-            mutate(
+            await mutate(
                 currentUsers =>
                     currentUsers.filter(user => user.user_id !== id),
                 false,
             )
         } catch (error) {
             handleError(error)
+            throw error // Re-throw untuk handling di component
         } finally {
             setIsSubmitting(false)
         }
@@ -102,7 +105,17 @@ export const useUserManagement = () => {
     const handleError = error => {
         console.error('User action error:', error)
         if (error.response?.data?.errors) {
-            setErrors(error.response.data.errors)
+            // Handle jika errors berupa object
+            if (typeof error.response.data.errors === 'object') {
+                const errorMessages = Object.values(
+                    error.response.data.errors,
+                ).flat()
+                setErrors(errorMessages)
+            } else {
+                setErrors(error.response.data.errors)
+            }
+        } else if (error.response?.data?.message) {
+            setErrors([error.response.data.message])
         } else {
             setErrors(['An unexpected error occurred. Please try again.'])
         }
