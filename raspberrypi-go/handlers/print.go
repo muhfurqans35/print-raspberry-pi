@@ -37,7 +37,7 @@ func PrintHandler(w http.ResponseWriter, r *http.Request) {
 	encodedPath := url.QueryEscape(relativePath)
 
 	// URL untuk mengunduh file
-	fileURL := fmt.Sprintf("http://192.168.1.15:8000/api/download?path=%s", encodedPath)
+	fileURL := fmt.Sprintf("http://192.168.1.18:8000/api/download?path=%s", encodedPath)
 
 	// Menyimpan file sementara di Raspberry Pi
 	tempFilePath := "/tmp/print_temp.pdf"

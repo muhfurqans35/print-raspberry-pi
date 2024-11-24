@@ -29,6 +29,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::middleware(['permission:print_management'])->group(function () {
         Route::get('/printjobs', [PrintJobController::class, 'index']);
         Route::apiResource('printers', PrinterController::class);
+        Route::post('/printer-status', [PrinterController::class, 'updateStatus']);
         Route::post('/submitPrint', [PrintRequestController::class, 'submitPrint']);
     });
 
@@ -46,5 +47,3 @@ Route::get('/download', [FileController::class, 'download'])->name('file.downloa
 
 // Routes untuk User (tanpa middleware lain)
 Route::get('/user', [UserController::class, 'index'])->middleware(['auth:sanctum']);
-
-

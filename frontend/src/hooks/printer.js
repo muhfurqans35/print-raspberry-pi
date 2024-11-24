@@ -1,4 +1,3 @@
-// hooks/usePrinters.js
 import { useState } from 'react'
 import axios from '@/lib/axios'
 import useSWR from 'swr'
@@ -77,6 +76,40 @@ export const usePrinters = () => {
         }
     }
 
+    const updatePrinterStatus = async (name, status, details = null) => {
+        setIsSubmitting(true)
+        setErrors([])
+
+        try {
+            await initializeCsrf()
+
+            const response = await axios.post(
+                '/api/printer-status',
+                { name, status, details },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                },
+            )
+
+            mutate(currentPrinters => {
+                return currentPrinters.map(printer =>
+                    printer.name === name
+                        ? { ...printer, ...response.data }
+                        : printer,
+                )
+            }, false)
+
+            setStatus('success')
+            return response.data
+        } catch (error) {
+            handleError(error)
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
+
     const deletePrinter = async id => {
         setIsSubmitting(true)
         setErrors([])
@@ -119,6 +152,7 @@ export const usePrinters = () => {
         isSubmitting,
         createPrinter,
         updatePrinter,
+        updatePrinterStatus, // Ditambahkan fungsi ini
         deletePrinter,
     }
 }

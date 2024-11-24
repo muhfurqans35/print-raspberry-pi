@@ -15,10 +15,11 @@ import {
     ListItem,
     ListItemText,
     IconButton,
+    Chip,
 } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
-import Header from '../../../components/Header'
+import Header from '@/components/Header'
 
 const PrintersPage = () => {
     const {
@@ -30,7 +31,6 @@ const PrintersPage = () => {
         deletePrinter,
     } = usePrinters()
     const [name, setName] = useState('')
-    const [printJobId, setPrintJobId] = useState('')
     const [editId, setEditId] = useState(null)
     const { permissions } = useAuth()
     const router = useRouter()
@@ -43,7 +43,7 @@ const PrintersPage = () => {
 
     const handleSubmit = e => {
         e.preventDefault()
-        const printerData = { name, print_job_id: printJobId }
+        const printerData = { name }
 
         if (editId) {
             updatePrinter(editId, printerData)
@@ -52,20 +52,36 @@ const PrintersPage = () => {
         }
 
         setName('')
-        setPrintJobId('')
         setEditId(null)
     }
 
     const handleEdit = printer => {
         setName(printer.name)
-        setPrintJobId(printer.print_job_id)
         setEditId(printer.printer_id)
     }
 
     const resetForm = () => {
         setName('')
-        setPrintJobId('')
         setEditId(null)
+    }
+
+    const getStatusChip = status => {
+        // Map status to colors and labels
+        const statusColors = {
+            ready: 'success',
+            printing: 'primary',
+            error: 'error',
+            'out of paper': 'warning',
+        }
+
+        return (
+            <Chip
+                label={status || 'Unknown'}
+                color={statusColors[status] || 'default'}
+                size="small"
+                variant="outlined"
+            />
+        )
     }
 
     if (loading) return <CircularProgress />
@@ -86,7 +102,7 @@ const PrintersPage = () => {
                                         {error}
                                     </Typography>
                                 ) : (
-                                    <>
+                                    <Box sx={{ mb: 4 }}>
                                         <Box
                                             component="form"
                                             onSubmit={handleSubmit}
@@ -139,7 +155,14 @@ const PrintersPage = () => {
                                                                 primary={
                                                                     printer.name
                                                                 }
+                                                                secondary={`Status: ${
+                                                                    printer.status ||
+                                                                    'Unknown'
+                                                                }`}
                                                             />
+                                                            {getStatusChip(
+                                                                printer.status,
+                                                            )}
                                                             <IconButton
                                                                 edge="end"
                                                                 onClick={() =>
@@ -170,7 +193,7 @@ const PrintersPage = () => {
                                                 )}
                                             </List>
                                         </Paper>
-                                    </>
+                                    </Box>
                                 )}
                             </Container>
                         </div>

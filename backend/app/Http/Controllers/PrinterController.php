@@ -59,4 +59,24 @@ class PrinterController extends Controller
 
         return response()->json(null, 204);
     }
+
+    // Memperbarui status printer berdasarkan nama
+    public function updateStatus(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'status' => 'required|string',
+            'details' => 'nullable|string',
+        ]);
+
+        $printer = Printer::updateOrCreate(
+            ['name' => $validated['name']], // Cari printer berdasarkan nama
+            [
+                'status' => $validated['status'],
+                'details' => $validated['details'] ?? null,
+            ]
+        );
+
+        return response()->json(['message' => 'Printer status updated successfully', 'printer' => $printer]);
+    }
 }
