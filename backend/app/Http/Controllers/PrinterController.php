@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Printer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class PrinterController extends Controller
 {
@@ -60,23 +61,28 @@ class PrinterController extends Controller
         return response()->json(null, 204);
     }
 
-    // Memperbarui status printer berdasarkan nama
-    public function updateStatus(Request $request)
+    public function updateStatus()
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'status' => 'required|string',
-            'details' => 'nullable|string',
-        ]);
+        try {
+            // Kirim permintaan ke Go untuk mendapatkan status printer
+            $response = Http::get('http://raspberrypi.local:8080/get-printer-status'); // URL Go Anda
 
-        $printer = Printer::updateOrCreate(
-            ['name' => $validated['name']], // Cari printer berdasarkan nama
-            [
-                'status' => $validated['status'],
-                'details' => $validated['details'] ?? null,
-            ]
-        );
+            if ($response->successful()) {
+                $printerStatus = $response->json();
+                return response()->json([
+                    'message' => 'Printer status fetched successfully',
+                    'data' => $printerStatus,
+                ]);
+            }
 
-        return response()->json(['message' => 'Printer status updated successfully', 'printer' => $printer]);
+            return response()->json([
+                'error' => 'Failed to fetch printer status from Go',
+            ], 500);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error communicating with Go backend',
+                'details' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

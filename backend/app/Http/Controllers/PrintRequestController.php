@@ -1,10 +1,12 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\Printer;
 use App\Models\PrintJob;
+use Illuminate\Support\Facades\Log;
 
 
 class PrintRequestController extends Controller
@@ -33,15 +35,11 @@ class PrintRequestController extends Controller
                 ], 404);
             }
 
-            // Ubah Windows path ke path Unix untuk server Go
-            $filePathForGo = str_replace('\\', '/', $filePath);
-
             // Cek MIME type file
             $mimeType = mime_content_type($filePath);
             $allowedMimeTypes = [
                 'application/pdf',
-                'application/msword',
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                'text/plain'
             ];
 
             if (!in_array($mimeType, $allowedMimeTypes)) {
@@ -62,7 +60,7 @@ class PrintRequestController extends Controller
             ];
 
             // Kirim request ke Go API server
-            $response = Http::timeout(60)
+            $response = Http::timeout(30)
                 ->withHeaders([
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json'
@@ -70,15 +68,14 @@ class PrintRequestController extends Controller
                 ->post(config('printing.go_api_url', 'http://raspberrypi.local:8080/api/print'), $dataToSend);
 
             // Log response dari Go server
-            \Log::info('Go server response', [
+            Log::info('Go server response', [
                 'status' => $response->status(),
                 'body' => $response->body()
             ]);
 
             if ($response->successful()) {
                 $printJob->update([
-                    'status' => 'submitted',
-                    'last_print_attempt' => now(),
+                    'status' => 'printing',
                 ]);
 
                 return response()->json([
@@ -92,10 +89,9 @@ class PrintRequestController extends Controller
                 'message' => 'Failed to submit print request',
                 'error' => $response->body()
             ], 500);
-
         } catch (\Exception $e) {
             // Log error jika terjadi masalah
-            \Log::error('Print submission error', [
+            Log::error('Print submission error', [
                 'error' => $e->getMessage(),
                 'print_job_id' => $printJob->print_job_id ?? null,
                 'trace' => $e->getTraceAsString()

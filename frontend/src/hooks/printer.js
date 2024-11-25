@@ -6,6 +6,9 @@ export const usePrinters = () => {
     const [errors, setErrors] = useState([])
     const [status, setStatus] = useState(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [printerStatus, setPrinterStatus] = useState(null)
+    const [statusMessage, setStatusMessage] = useState('')
+    const [isFetchingStatus, setIsFetchingStatus] = useState(false)
 
     // Initialize CSRF protection
     const initializeCsrf = async () => {
@@ -16,6 +19,34 @@ export const usePrinters = () => {
     const { data: printers, error, mutate } = useSWR('/api/printers', url =>
         axios.get(url).then(res => res.data),
     )
+
+    // Function to fetch printer status from Laravel
+    const fetchPrinterStatus = async () => {
+        setIsFetchingStatus(true)
+        setStatusMessage('')
+
+        try {
+            await initializeCsrf()
+
+            const response = await axios.post(
+                '/api/printer-status',
+                {},
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                },
+            )
+
+            setPrinterStatus(response.data.data)
+            setStatusMessage(`Success: ${response.data.message}`)
+        } catch (error) {
+            console.error('Error fetching printer status:', error)
+            setStatusMessage('Error: Unable to fetch printer status')
+        } finally {
+            setIsFetchingStatus(false)
+        }
+    }
 
     const createPrinter = async printerData => {
         setIsSubmitting(true)
@@ -76,40 +107,6 @@ export const usePrinters = () => {
         }
     }
 
-    const updatePrinterStatus = async (name, status, details = null) => {
-        setIsSubmitting(true)
-        setErrors([])
-
-        try {
-            await initializeCsrf()
-
-            const response = await axios.post(
-                '/api/printer-status',
-                { name, status, details },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                },
-            )
-
-            mutate(currentPrinters => {
-                return currentPrinters.map(printer =>
-                    printer.name === name
-                        ? { ...printer, ...response.data }
-                        : printer,
-                )
-            }, false)
-
-            setStatus('success')
-            return response.data
-        } catch (error) {
-            handleError(error)
-        } finally {
-            setIsSubmitting(false)
-        }
-    }
-
     const deletePrinter = async id => {
         setIsSubmitting(true)
         setErrors([])
@@ -148,11 +145,14 @@ export const usePrinters = () => {
         printers,
         errors,
         status,
+        printerStatus,
+        statusMessage,
+        isFetchingStatus,
         isLoading: !error && !printers,
         isSubmitting,
         createPrinter,
         updatePrinter,
-        updatePrinterStatus, // Ditambahkan fungsi ini
         deletePrinter,
+        fetchPrinterStatus,
     }
 }

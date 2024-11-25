@@ -15,7 +15,7 @@ func main() {
 
 	// Set up the routes
 	r.HandleFunc("/api/print", handlers.PrintHandler).Methods("POST")
-	r.HandleFunc("/update-printer-status", handlers.PrintHandler).Methods("GET")
+	r.HandleFunc("/get-printer-status", handlers.PrinterStatusHandler).Methods("GET")
 	// Start server
 	log.Println("Starting server on :8080")
 	log.Fatal(http.ListenAndServe(":8080", r))

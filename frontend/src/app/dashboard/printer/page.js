@@ -15,22 +15,26 @@ import {
     ListItem,
     ListItemText,
     IconButton,
-    Chip,
 } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
-import Header from '@/components/Header'
+import Header from '../../../components/Header'
 
 const PrintersPage = () => {
     const {
         printers,
         loading,
         error,
+        isFetchingStatus,
+        statusMessage,
+        printerStatus,
         createPrinter,
         updatePrinter,
         deletePrinter,
+        fetchPrinterStatus,
     } = usePrinters()
     const [name, setName] = useState('')
+    const [printJobId, setPrintJobId] = useState('')
     const [editId, setEditId] = useState(null)
     const { permissions } = useAuth()
     const router = useRouter()
@@ -43,7 +47,7 @@ const PrintersPage = () => {
 
     const handleSubmit = e => {
         e.preventDefault()
-        const printerData = { name }
+        const printerData = { name, print_job_id: printJobId }
 
         if (editId) {
             updatePrinter(editId, printerData)
@@ -52,40 +56,21 @@ const PrintersPage = () => {
         }
 
         setName('')
+        setPrintJobId('')
         setEditId(null)
     }
 
     const handleEdit = printer => {
         setName(printer.name)
+        setPrintJobId(printer.print_job_id)
         setEditId(printer.printer_id)
     }
 
     const resetForm = () => {
         setName('')
+        setPrintJobId('')
         setEditId(null)
     }
-
-    const getStatusChip = status => {
-        // Map status to colors and labels
-        const statusColors = {
-            ready: 'success',
-            printing: 'primary',
-            error: 'error',
-            'out of paper': 'warning',
-        }
-
-        return (
-            <Chip
-                label={status || 'Unknown'}
-                color={statusColors[status] || 'default'}
-                size="small"
-                variant="outlined"
-            />
-        )
-    }
-
-    if (loading) return <CircularProgress />
-    if (error) return <Typography color="error">{error}</Typography>
 
     return (
         <>
@@ -102,7 +87,7 @@ const PrintersPage = () => {
                                         {error}
                                     </Typography>
                                 ) : (
-                                    <Box sx={{ mb: 4 }}>
+                                    <>
                                         <Box
                                             component="form"
                                             onSubmit={handleSubmit}
@@ -155,14 +140,7 @@ const PrintersPage = () => {
                                                                 primary={
                                                                     printer.name
                                                                 }
-                                                                secondary={`Status: ${
-                                                                    printer.status ||
-                                                                    'Unknown'
-                                                                }`}
                                                             />
-                                                            {getStatusChip(
-                                                                printer.status,
-                                                            )}
                                                             <IconButton
                                                                 edge="end"
                                                                 onClick={() =>
@@ -193,7 +171,41 @@ const PrintersPage = () => {
                                                 )}
                                             </List>
                                         </Paper>
-                                    </Box>
+                                        <Paper sx={{ p: 3, mb: 3 }}>
+                                            <Button
+                                                variant="contained"
+                                                onClick={fetchPrinterStatus}
+                                                disabled={isFetchingStatus}>
+                                                {isFetchingStatus
+                                                    ? 'Fetching...'
+                                                    : 'Check Printer Status'}
+                                            </Button>
+                                            {statusMessage && (
+                                                <Typography sx={{ mt: 2 }}>
+                                                    {statusMessage}
+                                                </Typography>
+                                            )}
+                                            {printerStatus && (
+                                                <List>
+                                                    {printerStatus.map(
+                                                        (status, index) => (
+                                                            <ListItem
+                                                                key={index}>
+                                                                <ListItemText
+                                                                    primary={
+                                                                        status.name
+                                                                    }
+                                                                    secondary={
+                                                                        status.status
+                                                                    }
+                                                                />
+                                                            </ListItem>
+                                                        ),
+                                                    )}
+                                                </List>
+                                            )}
+                                        </Paper>
+                                    </>
                                 )}
                             </Container>
                         </div>

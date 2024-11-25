@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"time"
 )
 
 type PrintRequest struct {
@@ -50,8 +52,18 @@ func PrintHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Setelah file berhasil disimpan, kirimkan ke printer
-	printFile(tempFilePath, request)
+	// Kirim response 200 OK ke Laravel setelah file berhasil diunduh
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"message": "Print job received and processing started"}`))
+
+	// Setelah file berhasil disimpan, kirimkan ke printer (ini dilakukan di goroutine agar tidak menghalangi response)
+	go func() {
+		if err := printFile(tempFilePath, request); err != nil {
+			log.Printf("Print failed: %v", err)
+		} else {
+			log.Println("Printing completed successfully")
+		}
+	}()
 }
 
 func downloadFile(fileURL string, destinationPath string) error {
@@ -83,7 +95,7 @@ func downloadFile(fileURL string, destinationPath string) error {
 	return nil
 }
 
-func printFile(filePath string, request PrintRequest) {
+func printFile(filePath string, request PrintRequest) error {
 	// Membangun perintah untuk mengirimkan pekerjaan ke printer
 	command := []string{
 		"lp",
@@ -95,11 +107,28 @@ func printFile(filePath string, request PrintRequest) {
 		filePath,
 	}
 
-	// Jalankan perintah `lp` dengan argumen yang disiapkan
-	err := exec.Command(command[0], command[1:]...).Run()
+	// Jalankan perintah lp dengan timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute) // Timeout 10 menit
+	defer cancel()
+
+	// Jalankan perintah lp dengan context
+	cmd := exec.CommandContext(ctx, command[0], command[1:]...)
+
+	// Jalankan perintah lp dan tunggu hingga selesai
+	err := cmd.Run()
 	if err != nil {
-		log.Printf("Printing failed: %v", err)
+		// Jika terjadi error karena timeout atau lainnya
+		if ctx.Err() == context.DeadlineExceeded {
+			log.Printf("Printing process timed out")
+			return fmt.Errorf("printing process timed out")
+		} else {
+			log.Printf("Printing failed: %v", err)
+			return fmt.Errorf("printing failed: %v", err)
+		}
 	}
+
+	log.Println("Printing completed successfully")
+	return nil
 }
 
 func orientationToCUPS(orientation string) string {

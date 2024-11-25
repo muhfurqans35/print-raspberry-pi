@@ -2,29 +2,30 @@ package handlers
 
 import (
 	"bytes"
-	"fmt"
+	"encoding/json"
 	"log"
 	"net/http"
 	"os/exec"
 	"strings"
 )
 
-// Handler untuk menjalankan lpstat dan mengirimkan data ke Laravel
-func printerStatusHandler(w http.ResponseWriter, r *http.Request) {
+// PrinterStatus represents the status of a printer.
+type PrinterStatus struct {
+	Name    string `json:"name"`
+	State   string `json:"status"`
+	Details string `json:"details"`
+}
+
+// PrinterStatusHandler handles HTTP requests to fetch printer statuses.
+func PrinterStatusHandler(w http.ResponseWriter, r *http.Request) {
 	statuses := getPrinterStatuses()
 
-	for _, status := range statuses {
-		err := sendToLaravel(status)
-		if err != nil {
-			log.Printf("Error sending to Laravel: %v", err)
-		}
-	}
-
-	fmt.Fprintf(w, "Printer statuses processed and sent to Laravel")
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(statuses)
 }
 
 // Menjalankan lpstat untuk mendapatkan status printer
-func getPrinterStatuses() []map[string]string {
+func getPrinterStatuses() []PrinterStatus {
 	cmd := exec.Command("lpstat", "-p")
 	var out bytes.Buffer
 	cmd.Stdout = &out
@@ -35,13 +36,13 @@ func getPrinterStatuses() []map[string]string {
 	}
 
 	lines := strings.Split(out.String(), "\n")
-	var statuses []map[string]string
+	var statuses []PrinterStatus
 
 	for _, line := range lines {
 		if strings.Contains(line, "printer") {
 			status := parseLpstatLine(line)
 			if status != nil {
-				statuses = append(statuses, status)
+				statuses = append(statuses, *status)
 			}
 		}
 	}
@@ -50,7 +51,7 @@ func getPrinterStatuses() []map[string]string {
 }
 
 // Memproses satu baris output lpstat
-func parseLpstatLine(line string) map[string]string {
+func parseLpstatLine(line string) *PrinterStatus {
 	parts := strings.Fields(line)
 	if len(parts) < 4 {
 		return nil
@@ -65,28 +66,9 @@ func parseLpstatLine(line string) map[string]string {
 		state = "stopped"
 	}
 
-	return map[string]string{
-		"printer_name": parts[1],
-		"state":        state,
-		"details":      strings.Join(parts[3:], " "),
+	return &PrinterStatus{
+		Name:    parts[1],
+		State:   state,
+		Details: strings.Join(parts[3:], " "),
 	}
-}
-
-// Mengirimkan data ke Laravel
-func sendToLaravel(status map[string]string) error {
-	url := "http://192.168.1.18:8000/api/printer-status"
-
-	payload := fmt.Sprintf(`{
-		"name": "%s",
-		"status": "%s",
-		"details": "%s"
-	}`, status["printer_name"], status["state"], status["details"])
-
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer([]byte(payload)))
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	return nil
 }

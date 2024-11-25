@@ -19,6 +19,7 @@ import {
     ListItemIcon,
     Checkbox,
     ListItemText,
+    Paper,
 } from '@mui/material'
 import Header from '../../../components/Header'
 
@@ -30,8 +31,12 @@ const PrintPage = () => {
     } = usePrintJobs()
     const {
         printers,
+        isFetchingStatus,
+        statusMessage,
+        printerStatus,
         isLoading: loadingPrinters,
         isError: errorPrinters,
+        fetchPrinterStatus,
     } = usePrinters()
 
     const [selectedPrinter, setSelectedPrinter] = useState('')
@@ -173,6 +178,39 @@ const PrintPage = () => {
                                             }>
                                             Submit Print
                                         </Button>
+
+                                        <Button
+                                            variant="contained"
+                                            onClick={fetchPrinterStatus}
+                                            disabled={isFetchingStatus}
+                                            sx={{ ml: 2 }}>
+                                            {isFetchingStatus
+                                                ? 'Fetching...'
+                                                : 'Check Printer Status'}
+                                        </Button>
+                                        {statusMessage && (
+                                            <Typography sx={{ mt: 2 }}>
+                                                {statusMessage}
+                                            </Typography>
+                                        )}
+                                        {printerStatus && (
+                                            <List>
+                                                {printerStatus.map(
+                                                    (status, index) => (
+                                                        <ListItem key={index}>
+                                                            <ListItemText
+                                                                primary={
+                                                                    status.name
+                                                                }
+                                                                secondary={
+                                                                    status.status
+                                                                }
+                                                            />
+                                                        </ListItem>
+                                                    ),
+                                                )}
+                                            </List>
+                                        )}
                                     </>
                                 )}
                             </Container>
