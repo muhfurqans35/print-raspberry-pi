@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 =======
 
+=======
+>>>>>>> 2deaabd57bf7d6e73c50ffccad98e06b8b8ecaa5
 # Print Management Application
 
 A Print Job Management application using Laravel, PostgreSQL, Next.js, and Raspberry Pi. The application allows customers to place print job orders, which are processed by admins through several stages until the print job is completed and ready for customer pickup.
@@ -22,23 +25,41 @@ A Print Job Management application using Laravel, PostgreSQL, Next.js, and Raspb
 - **View order list from all customers**: Admins can view all orders from customers in one place.
 - **Print order print job**: Admins can print orders on the Raspberry Pi.
 - **Add, edit, and delete items**: Admins can manage the items.
+<<<<<<< HEAD
   **Customer Workflow**:
+=======
+  
+ **Customer Workflow**:
+>>>>>>> 2deaabd57bf7d6e73c50ffccad98e06b8b8ecaa5
 - Customers can place a print job or item order.
 - Once ordered, the print job status is `new`.
 
 **Admin Workflow**:
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2deaabd57bf7d6e73c50ffccad98e06b8b8ecaa5
 - Admin accepts the print job and changes the status to `accepted`.
 - Admin starts printing or packaging, changing the status to `printing` or `packaging`.
 - Once the print job is completed, the admin updates the status to `printed/pickup ready`.
 
 **Customer Pickup**:
+<<<<<<< HEAD
 
 - After the customer picks up the print job, the status is updated to `finished`.
 
 ## Technologies Used
 
+=======
+- After the customer picks up the print job, the status is updated to `finished`.
+  
+## Technologies Used
+>>>>>>> 2deaabd57bf7d6e73c50ffccad98e06b8b8ecaa5
 - **Backend**: Laravel
 - **Frontend**: Next.js
 - **Database**: PostgreSQL
 - **Printer**: Raspberry Pi/Go (to handle print jobs)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2deaabd57bf7d6e73c50ffccad98e06b8b8ecaa5
