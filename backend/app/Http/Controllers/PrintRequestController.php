@@ -8,7 +8,6 @@ use App\Models\Printer;
 use App\Models\PrintJob;
 use Illuminate\Support\Facades\Log;
 
-
 class PrintRequestController extends Controller
 {
     public function submitPrint(Request $request)
@@ -59,13 +58,13 @@ class PrintRequestController extends Controller
                 'color_mode' => $printJob->color_mode ?? 'color',
             ];
 
-            // Kirim request ke Go API server
-            $response = Http::timeout(30)
+            // Kirim request ke Go API server dengan timeout yang lebih pendek
+            $response = Http::timeout(5)
                 ->withHeaders([
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json'
                 ])
-                ->post(config('printing.go_api_url', 'http://raspberrypi.local:8080/api/print'), $dataToSend);
+                ->post(config('printing.go_api_url', 'http://192.168.1.31:8080/api/print'), $dataToSend);
 
             // Log response dari Go server
             Log::info('Go server response', [
@@ -74,12 +73,15 @@ class PrintRequestController extends Controller
             ]);
 
             if ($response->successful()) {
+                // Update status print job menjadi processing
                 $printJob->update([
-                    'status' => 'printing',
+                    'status' => 'processing',
+                    'submitted_at' => now(),
                 ]);
 
                 return response()->json([
                     'message' => 'Print request submitted successfully',
+                    'status' => 'processing',
                     'job_id' => $printJob->print_job_id,
                     'printer' => $printer->name
                 ]);
@@ -90,7 +92,6 @@ class PrintRequestController extends Controller
                 'error' => $response->body()
             ], 500);
         } catch (\Exception $e) {
-            // Log error jika terjadi masalah
             Log::error('Print submission error', [
                 'error' => $e->getMessage(),
                 'print_job_id' => $printJob->print_job_id ?? null,

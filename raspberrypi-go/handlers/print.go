@@ -23,6 +23,11 @@ type PrintRequest struct {
 	ColorMode   string `json:"color_mode"`
 }
 
+type PrintResponse struct {
+	Message string `json:"message"`
+	Status  string `json:"status"`
+}
+
 func PrintHandler(w http.ResponseWriter, r *http.Request) {
 	var request PrintRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -33,37 +38,89 @@ func PrintHandler(w http.ResponseWriter, r *http.Request) {
 	// Log data yang diterima
 	log.Printf("Received print request: %+v", request)
 
+	// Segera kirim response success ke Laravel
+	response := PrintResponse{
+		Message: "Print job received and queued for processing",
+		Status:  "queued",
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		log.Printf("Error sending response: %v", err)
+		return
+	}
+
+	// Flush response buffer
+	if f, ok := w.(http.Flusher); ok {
+		f.Flush()
+	}
+
+	// Jalankan proses print di background
+	go processPrintJob(request)
+}
+
+func processPrintJob(request PrintRequest) {
 	// Ambil path relatif dari file yang akan diunduh
 	relativePath := request.FilePath
-	// Encode path untuk query string URL
 	encodedPath := url.QueryEscape(relativePath)
 
 	// URL untuk mengunduh file
 	fileURL := fmt.Sprintf("http://192.168.1.18:8000/api/download?path=%s", encodedPath)
 
 	// Menyimpan file sementara di Raspberry Pi
-	tempFilePath := "/tmp/print_temp.pdf"
+	tempFilePath := fmt.Sprintf("/tmp/print_%d.pdf", time.Now().UnixNano())
 
-	// Download file menggunakan http.Get
-	err := downloadFile(fileURL, tempFilePath)
-	if err != nil {
-		http.Error(w, "Failed to download file: "+err.Error(), http.StatusInternalServerError)
+	// Download file
+	if err := downloadFile(fileURL, tempFilePath); err != nil {
 		log.Printf("Failed to download file: %v", err)
 		return
 	}
 
-	// Kirim response 200 OK ke Laravel setelah file berhasil diunduh
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message": "Print job received and processing started"}`))
+	// Kirim ke printer
+	if err := printFile(tempFilePath, request); err != nil {
+		log.Printf("Print failed: %v", err)
+	} else {
+		log.Println("Printing completed successfully")
+	}
 
-	// Setelah file berhasil disimpan, kirimkan ke printer (ini dilakukan di goroutine agar tidak menghalangi response)
-	go func() {
-		if err := printFile(tempFilePath, request); err != nil {
-			log.Printf("Print failed: %v", err)
+	// Hapus file temporary
+	os.Remove(tempFilePath)
+}
+
+func printFile(filePath string, request PrintRequest) error {
+	// Membangun perintah untuk mengirimkan pekerjaan ke printer
+	command := []string{
+		"lp",
+		"-d", request.PrinterName,
+		"-o", "media=" + request.PaperSize,
+		"-o", "color_mode=" + colormode(request.ColorMode),
+		"-o", "orientation-requested=" + orientationToCUPS(request.Orientation),
+		"-n", strconv.Itoa(request.Copies),
+		filePath,
+	}
+
+	// Jalankan perintah lp dengan timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Minute) // Timeout 60 menit
+	defer cancel()
+
+	// Jalankan perintah lp dengan context
+	cmd := exec.CommandContext(ctx, command[0], command[1:]...)
+
+	// Jalankan perintah lp dan tunggu hingga selesai
+	err := cmd.Run()
+	if err != nil {
+		// Jika terjadi error karena timeout atau lainnya
+		if ctx.Err() == context.DeadlineExceeded {
+			log.Printf("Printing process timed out")
+			return fmt.Errorf("printing process timed out")
 		} else {
-			log.Println("Printing completed successfully")
+			log.Printf("Printing failed: %v", err)
+			return fmt.Errorf("printing failed: %v", err)
 		}
-	}()
+	}
+
+	return nil
 }
 
 func downloadFile(fileURL string, destinationPath string) error {
@@ -92,42 +149,6 @@ func downloadFile(fileURL string, destinationPath string) error {
 		return fmt.Errorf("failed to write file: %v", err)
 	}
 
-	return nil
-}
-
-func printFile(filePath string, request PrintRequest) error {
-	// Membangun perintah untuk mengirimkan pekerjaan ke printer
-	command := []string{
-		"lp",
-		"-d", request.PrinterName,
-		"-o", "media=" + request.PaperSize,
-		"-o", "color_mode=" + colormode(request.ColorMode),
-		"-o", "orientation-requested=" + orientationToCUPS(request.Orientation),
-		"-n", strconv.Itoa(request.Copies),
-		filePath,
-	}
-
-	// Jalankan perintah lp dengan timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute) // Timeout 10 menit
-	defer cancel()
-
-	// Jalankan perintah lp dengan context
-	cmd := exec.CommandContext(ctx, command[0], command[1:]...)
-
-	// Jalankan perintah lp dan tunggu hingga selesai
-	err := cmd.Run()
-	if err != nil {
-		// Jika terjadi error karena timeout atau lainnya
-		if ctx.Err() == context.DeadlineExceeded {
-			log.Printf("Printing process timed out")
-			return fmt.Errorf("printing process timed out")
-		} else {
-			log.Printf("Printing failed: %v", err)
-			return fmt.Errorf("printing failed: %v", err)
-		}
-	}
-
-	log.Println("Printing completed successfully")
 	return nil
 }
 

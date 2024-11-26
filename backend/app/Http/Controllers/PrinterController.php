@@ -65,7 +65,7 @@ class PrinterController extends Controller
     {
         try {
             // Kirim permintaan ke Go untuk mendapatkan status printer
-            $response = Http::get('http://raspberrypi.local:8080/get-printer-status'); // URL Go Anda
+            $response = Http::get('http://192.168.1.31:8080/get-printer-status'); // URL Go Anda
 
             if ($response->successful()) {
                 $printerStatus = $response->json();
