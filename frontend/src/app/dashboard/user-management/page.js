@@ -36,6 +36,7 @@ const UserManagement = () => {
         users,
         isLoading,
         error,
+        errors,
         createUser,
         updateUser,
         deleteUser,
@@ -184,6 +185,10 @@ const UserManagement = () => {
                             <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
                                 {isLoading ? (
                                     <CircularProgress />
+                                ) : error ? (
+                                    <Typography color="error">
+                                        {error}
+                                    </Typography>
                                 ) : (
                                     <>
                                         <Box
@@ -610,6 +615,11 @@ const UserManagement = () => {
                                             </Alert>
                                         </Snackbar>
                                     </>
+                                )}
+                                {errors && (
+                                    <Typography color="error" variant="body2">
+                                        {errors}
+                                    </Typography>
                                 )}
                             </Container>
                         </div>

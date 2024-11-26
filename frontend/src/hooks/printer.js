@@ -144,6 +144,7 @@ export const usePrinters = () => {
     return {
         printers,
         errors,
+        error,
         status,
         printerStatus,
         statusMessage,

@@ -80,7 +80,7 @@ export default function OrderPage() {
     const { items } = useItems()
     const [orderItems, setOrderItems] = useState([])
 
-    const { loading, error, submitOrder } = useOrder()
+    const { loading, error, submitOrder, errors } = useOrder()
     const router = useRouter()
     const { permissions, emailVerified } = useAuth()
 
@@ -1094,6 +1094,11 @@ export default function OrderPage() {
                                             </Grid>
                                         </Box>
                                     </>
+                                )}
+                                {errors && (
+                                    <Typography color="error" variant="body2">
+                                        {errors}
+                                    </Typography>
                                 )}
                             </Container>
                         </div>

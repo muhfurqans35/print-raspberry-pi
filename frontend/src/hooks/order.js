@@ -1,4 +1,3 @@
-// hooks/order.js
 import { useState } from 'react'
 import axios from '@/lib/axios'
 import useSWR from 'swr'
@@ -18,7 +17,8 @@ export const useOrder = () => {
         axios.get(url).then(res => res.data),
     )
 
-    const submitOrder = async (formData, type) => {
+    // Submit order
+    const submitOrder = async formData => {
         setIsSubmitting(true)
         setErrors([])
 
@@ -26,7 +26,7 @@ export const useOrder = () => {
             // Initialize CSRF protection before making the request
             await initializeCsrf()
 
-            // Inisialisasi response di sini
+            // Submit order
             const response = await axios.post('/api/orders', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -34,25 +34,29 @@ export const useOrder = () => {
                 },
             })
 
-            // Mutate the orders cache to include the new order
+            // Update the cache optimistically
             mutate(currentOrders => {
                 const updatedOrders = Array.isArray(currentOrders)
                     ? [...currentOrders]
                     : []
-                updatedOrders.unshift(response.data) // response sudah didefinisikan sebelumnya
+                updatedOrders.unshift(response.data) // Add the new order to the beginning
                 return updatedOrders
-            }, false) // Set to false to avoid revalidation immediately
+            }, false) // Don't trigger revalidation immediately
 
             setStatus('success')
             return response.data
         } catch (error) {
             console.error('Order submission error:', error)
 
+            // Handle different error responses
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors)
             } else {
                 setErrors(['An unexpected error occurred. Please try again.'])
             }
+
+            // Optionally set status to 'error' to show global error message
+            setStatus('error')
 
             throw error
         } finally {

@@ -124,6 +124,7 @@ export const useUserManagement = () => {
     return {
         users,
         errors,
+        error,
         isLoading: !users && !error,
         isSubmitting,
         createUser,

@@ -43,6 +43,7 @@ const Item = () => {
         addItem,
         updateItem,
         deleteItem,
+        errors,
     } = useItems()
 
     const [openModal, setOpenModal] = useState(false)
@@ -317,6 +318,11 @@ const Item = () => {
                                             </Box>
                                         </Modal>
                                     </>
+                                )}
+                                {errors && (
+                                    <Typography color="error" variant="body2">
+                                        {errors}
+                                    </Typography>
                                 )}
                             </Container>
                         </div>

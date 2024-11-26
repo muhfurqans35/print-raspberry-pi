@@ -38,7 +38,7 @@ export default function OrderPage() {
         sortDirection: 'desc',
     })
 
-    const { data, isLoading, error } = getOrder(filters)
+    const { data, isLoading, error, updateError } = getOrder(filters)
     const orders = data?.orders || []
     const pagination = data?.pagination
     const router = useRouter()
@@ -411,6 +411,11 @@ export default function OrderPage() {
                                             </>
                                         )}
                                     </>
+                                )}
+                                {updateError && (
+                                    <Typography color="error" variant="body2">
+                                        {updateError}
+                                    </Typography>
                                 )}
                             </Container>
                         </div>

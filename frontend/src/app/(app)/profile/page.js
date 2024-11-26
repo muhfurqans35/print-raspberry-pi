@@ -387,6 +387,11 @@ const Profile = () => {
                                         </CardContent>
                                     </>
                                 )}
+                                {errors && (
+                                    <Typography color="error" variant="body2">
+                                        {errors}
+                                    </Typography>
+                                )}
                             </Container>
                         </div>
                     </div>

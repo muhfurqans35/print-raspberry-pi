@@ -25,6 +25,7 @@ const PrintersPage = () => {
         printers,
         loading,
         error,
+        errors,
         isFetchingStatus,
         statusMessage,
         printerStatus,
@@ -206,6 +207,11 @@ const PrintersPage = () => {
                                             )}
                                         </Paper>
                                     </>
+                                )}
+                                {errors && (
+                                    <Typography color="error" variant="body2">
+                                        {errors}
+                                    </Typography>
                                 )}
                             </Container>
                         </div>
