@@ -50,12 +50,17 @@ const useItems = () => {
 
         const formData = new FormData()
         formData.append('name', updatedItem.name)
-        formData.append('description', updatedItem.description)
+        if (updatedItem.description) {
+            formData.append('description', updatedItem.description)
+        }
         formData.append('price', updatedItem.price)
         formData.append('stock_quantity', updatedItem.stock_quantity)
         if (imageFile) {
             formData.append('image', imageFile)
         }
+
+        // Tambahkan _method sebagai PUT
+        formData.append('_method', 'PUT')
 
         try {
             const response = await axios.post(`/api/items/${id}`, formData, {

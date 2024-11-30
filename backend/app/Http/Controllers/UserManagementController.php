@@ -7,19 +7,20 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\UserManagementUpdateRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class UserManagementController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware('role:super_admin|admin'); // Using role middleware for better access control
-    // }
 
     public function index()
     {
-        $users = Auth::user()->hasRole('super_admin')
-            ? User::with('roles')->get()
-            : User::role('user')->get();
+        $cacheKey = 'users:all';
+
+        $users = Cache::remember($cacheKey, 600, function () {
+            return Auth::user()->hasRole('super_admin')
+                ? User::with('roles')->get()
+                : User::role('user')->get();
+        });
 
         return response()->json($users);
     }
@@ -40,6 +41,9 @@ class UserManagementController extends Controller
 
         $user = User::create($userData);
         $user->assignRole('admin');
+
+        Cache::forget('users:all');
+        Cache::forget('user_roles_permissions_' . $user->id);
 
         return response()->json($user, 201);
     }
@@ -69,6 +73,9 @@ class UserManagementController extends Controller
 
         $user->update($userData);
 
+        Cache::forget('users:all');
+        Cache::forget('user_roles_permissions_' . $user->id);
+
         return response()->json($user);
     }
 
@@ -86,6 +93,8 @@ class UserManagementController extends Controller
 
         $user->delete();
 
+        Cache::forget('users:all');
+        Cache::forget('user_roles_permissions_' . $user->id);
         return response()->json(['message' => 'User deleted successfully']);
     }
 }

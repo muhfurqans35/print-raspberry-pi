@@ -8,12 +8,6 @@ use Illuminate\Support\Facades\Http;
 
 class PrinterController extends Controller
 {
-    // Menampilkan daftar printer dan print job
-    public function printindex()
-    {
-        $printers = Printer::with('printJob')->get();
-        return response()->json($printers);
-    }
     public function Index()
     {
         return Printer::all();
@@ -29,13 +23,6 @@ class PrinterController extends Controller
 
         $printer = Printer::create($request->all());
         return response()->json($printer, 201);
-    }
-
-    // Menampilkan printer berdasarkan ID
-    public function show($id)
-    {
-        $printer = Printer::with('printJob')->findOrFail($id);
-        return response()->json($printer);
     }
 
     // Memperbarui data printer

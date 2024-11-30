@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users', 'user_id')->onDelete('cascade');
             $table->dateTime('order_date');
             $table->decimal('total_amount', 10, 2);
-            $table->enum('status', ['new', 'accepted', 'printing', 'printed', 'pickup_ready', 'canceled', 'finished', 'failed']);
+            $table->enum('status', ['new', 'paid', 'processing', 'pickup_ready', 'finished', 'canceled',  'failed']);
             $table->timestamps();
         });
     }

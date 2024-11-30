@@ -23,8 +23,6 @@ A Print Job Management application using Laravel, PostgreSQL, Next.js, and Raspb
 
   **Customer Workflow**:
 
-  > > > > > > > 2deaabd57bf7d6e73c50ffccad98e06b8b8ecaa5
-
 - Customers can place a print job or item order.
 - Once ordered, the print job status is `new`.
 
@@ -39,8 +37,6 @@ A Print Job Management application using Laravel, PostgreSQL, Next.js, and Raspb
 - After the customer picks up the print job, the status is updated to `finished`.
 
 ## Technologies Used
-
-> > > > > > > 2deaabd57bf7d6e73c50ffccad98e06b8b8ecaa5
 
 - **Backend**: Laravel
 - **Frontend**: Next.js

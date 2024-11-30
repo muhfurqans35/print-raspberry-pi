@@ -6,7 +6,6 @@ export const useUserManagement = () => {
     const [errors, setErrors] = useState([])
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    // Fetch data for users using SWR
     const { data: users, error, mutate } = useSWR(
         '/api/usermanagements',
         async () => {
@@ -19,7 +18,6 @@ export const useUserManagement = () => {
         },
     )
 
-    // Create new user
     const createUser = async userData => {
         setIsSubmitting(true)
         setErrors([])
@@ -43,19 +41,17 @@ export const useUserManagement = () => {
             return response.data
         } catch (error) {
             handleError(error)
-            throw error // Re-throw untuk handling di component
+            throw error
         } finally {
             setIsSubmitting(false)
         }
     }
 
-    // Update existing user
     const updateUser = async (id, updatedData) => {
         setIsSubmitting(true)
         setErrors([])
 
         try {
-            // Gunakan POST dengan _method=PUT
             const response = await axios.post(
                 `/api/usermanagements/${id}`,
                 updatedData,
@@ -75,13 +71,12 @@ export const useUserManagement = () => {
             return response.data
         } catch (error) {
             handleError(error)
-            throw error // Re-throw untuk handling di component
+            throw error
         } finally {
             setIsSubmitting(false)
         }
     }
 
-    // Delete user
     const deleteUser = async id => {
         setIsSubmitting(true)
         setErrors([])
@@ -96,7 +91,7 @@ export const useUserManagement = () => {
             )
         } catch (error) {
             handleError(error)
-            throw error // Re-throw untuk handling di component
+            throw error
         } finally {
             setIsSubmitting(false)
         }
@@ -105,7 +100,6 @@ export const useUserManagement = () => {
     const handleError = error => {
         console.error('User action error:', error)
         if (error.response?.data?.errors) {
-            // Handle jika errors berupa object
             if (typeof error.response.data.errors === 'object') {
                 const errorMessages = Object.values(
                     error.response.data.errors,

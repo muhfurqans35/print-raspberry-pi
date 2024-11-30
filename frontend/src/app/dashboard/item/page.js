@@ -49,6 +49,7 @@ const Item = () => {
     const [openModal, setOpenModal] = useState(false)
     const [isEditing, setIsEditing] = useState(false)
     const [currentItem, setCurrentItem] = useState(null)
+    const [formErrors, setFormErrors] = useState({})
     const [newItem, setNewItem] = useState({
         name: '',
         description: '',
@@ -76,8 +77,21 @@ const Item = () => {
 
     const handleSubmit = e => {
         e.preventDefault()
+
+        const errors = {}
+
+        if (!isEditing && !imageFile) {
+            errors.image = 'Image is required.'
+        }
+
+        if (Object.keys(errors).length > 0) {
+            setFormErrors(errors)
+            return
+        }
+
+        setFormErrors({})
         if (isEditing) {
-            updateItem(currentItem.id, newItem, imageFile)
+            updateItem(currentItem.item_id, newItem, imageFile)
         } else {
             addItem(newItem, imageFile)
         }
@@ -203,7 +217,7 @@ const Item = () => {
                                                                     color="error"
                                                                     onClick={() =>
                                                                         deleteItem(
-                                                                            item.id,
+                                                                            item.item_id,
                                                                         )
                                                                     }>
                                                                     <DeleteIcon />
@@ -243,6 +257,7 @@ const Item = () => {
                                                         }
                                                         required
                                                     />
+
                                                     <TextField
                                                         fullWidth
                                                         margin="normal"
@@ -261,27 +276,30 @@ const Item = () => {
                                                         label="Price"
                                                         name="price"
                                                         type="number"
-                                                        value={Number(
-                                                            newItem.price,
-                                                        )}
+                                                        required
+                                                        value={newItem.price}
+                                                        inputProps={{
+                                                            min: 1000,
+                                                        }}
                                                         onChange={
                                                             handleInputChange
                                                         }
-                                                        required
                                                     />
+
                                                     <TextField
                                                         fullWidth
                                                         margin="normal"
                                                         label="Stock Quantity"
                                                         name="stock_quantity"
                                                         type="number"
+                                                        required
+                                                        inputProps={{ min: 1 }}
                                                         value={
                                                             newItem.stock_quantity
                                                         }
                                                         onChange={
                                                             handleInputChange
                                                         }
-                                                        required
                                                     />
                                                     <Box
                                                         sx={{
@@ -300,11 +318,9 @@ const Item = () => {
                                                                 onChange={
                                                                     handleImageChange
                                                                 }
-                                                                required={
-                                                                    !isEditing
-                                                                }
                                                             />
                                                         </Button>
+
                                                         <Button
                                                             type="submit"
                                                             variant="contained"
@@ -313,6 +329,41 @@ const Item = () => {
                                                                 ? 'Update Item'
                                                                 : 'Add Item'}
                                                         </Button>
+                                                    </Box>
+                                                    <Box
+                                                        sx={{
+                                                            mt: 1,
+                                                        }}>
+                                                        {imageFile && (
+                                                            <Typography
+                                                                variant="body4"
+                                                                sx={{
+                                                                    mt: 1,
+                                                                    color:
+                                                                        'green',
+                                                                }}>
+                                                                Selected file:{' '}
+                                                                {imageFile.name}
+                                                            </Typography>
+                                                        )}
+                                                    </Box>
+                                                    <Box
+                                                        sx={{
+                                                            mt: 1,
+                                                        }}>
+                                                        {formErrors.image && (
+                                                            <Typography
+                                                                variant="body4"
+                                                                sx={{
+                                                                    mt: 1,
+                                                                    color:
+                                                                        'red',
+                                                                }}>
+                                                                {
+                                                                    formErrors.image
+                                                                }
+                                                            </Typography>
+                                                        )}
                                                     </Box>
                                                 </form>
                                             </Box>

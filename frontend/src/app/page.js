@@ -1,6 +1,12 @@
 'use client'
 import React from 'react'
-import { Box, Button, Container, Typography } from '@mui/material'
+import {
+    Box,
+    Button,
+    Container,
+    Typography,
+    CircularProgress,
+} from '@mui/material'
 import {
     Print,
     ArrowForward,
@@ -11,16 +17,25 @@ import {
 import NavbarHero from '@/components/NavbarHero'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/auth'
+import Loading from '@/components/Loading'
 
 const LandingPage = () => {
     const router = useRouter()
-    const { user } = useAuth()
+    const { user, loading } = useAuth({ middleware: 'guest' })
+
     const handleOrders = () => {
         router.push('/order/create')
     }
+
     const handleFAQ = () => {
         router.push('/faq')
     }
+
+    // Show loading state while auth is being checked
+    if (loading) {
+        return <Loading />
+    }
+
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: 'black', color: 'white' }}>
             {/* Navbar */}
@@ -92,9 +107,7 @@ const LandingPage = () => {
                                         },
                                     }}
                                     endIcon={<ArrowForward />}
-                                    onClick={() => {
-                                        handleOrders
-                                    }}>
+                                    onClick={handleOrders}>
                                     Mulai Sekarang
                                 </Button>
                                 <Button
@@ -107,9 +120,7 @@ const LandingPage = () => {
                                             bgcolor: 'rgba(255,255,255,0.1)',
                                         },
                                     }}
-                                    onClick={() => {
-                                        handleFAQ
-                                    }}>
+                                    onClick={handleFAQ}>
                                     Pelajari Lebih Lanjut
                                 </Button>
                             </Box>

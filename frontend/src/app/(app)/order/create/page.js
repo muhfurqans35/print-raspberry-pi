@@ -541,9 +541,9 @@ export default function OrderPage() {
                                                                         variant="subtitle1"
                                                                         color="primary">
                                                                         Rp.
-                                                                        {Number(
-                                                                            item.price.toLocaleString(),
-                                                                        )}
+                                                                        {parseInt(
+                                                                            item.price,
+                                                                        ).toLocaleString()}
                                                                     </Typography>
                                                                     <Typography
                                                                         variant="body2"

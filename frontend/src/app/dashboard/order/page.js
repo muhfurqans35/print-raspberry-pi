@@ -15,7 +15,7 @@ import {
     MenuItem,
 } from '@mui/material'
 import { useState, useEffect } from 'react'
-import { getOrder } from '@/hooks/getorder'
+import { useOrder } from '@/hooks/order'
 import { useAuth } from '@/hooks/auth'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
@@ -33,7 +33,8 @@ export default function OrderManagementPage() {
         updateOrderStatus,
         isUpdating,
         updateError,
-    } = getOrder(filters)
+        deleteOrder,
+    } = useOrder(filters)
     const { permissions } = useAuth()
     const router = useRouter()
 
@@ -46,12 +47,23 @@ export default function OrderManagementPage() {
     const handlePageChange = (event, newPage) => {
         setFilters(prevFilters => ({
             ...prevFilters,
-            page: newPage + 1, // Material-UI page starts at 0, we need to increment by 1
+            page: newPage + 1,
         }))
     }
 
     const handleStatusChange = (orderId, newStatus) => {
         updateOrderStatus(orderId, newStatus)
+    }
+
+    const handleDeleteOrder = async orderId => {
+        if (confirm('Are you sure you want to delete this order?')) {
+            try {
+                await deleteOrder(orderId)
+                alert('Order deleted successfully')
+            } catch (error) {
+                alert(`Failed to delete order: ${error.message}`)
+            }
+        }
     }
 
     const formatDate = dateStr => {
@@ -162,17 +174,12 @@ export default function OrderManagementPage() {
                                                                     disabled={
                                                                         isUpdating
                                                                     }>
+                                                                    {/* MenuItem options */}
                                                                     <MenuItem value="new">
                                                                         New
                                                                     </MenuItem>
                                                                     <MenuItem value="accepted">
-                                                                        Accepted
-                                                                    </MenuItem>
-                                                                    <MenuItem value="printing">
-                                                                        Printing
-                                                                    </MenuItem>
-                                                                    <MenuItem value="printed">
-                                                                        Printed
+                                                                        Processing
                                                                     </MenuItem>
                                                                     <MenuItem value="pickup_ready">
                                                                         Pickup
@@ -195,6 +202,20 @@ export default function OrderManagementPage() {
                                                                         }
                                                                     />
                                                                 )}
+                                                                <button
+                                                                    onClick={() =>
+                                                                        handleDeleteOrder(
+                                                                            order.order_id,
+                                                                        )
+                                                                    }
+                                                                    style={{
+                                                                        marginLeft:
+                                                                            '10px',
+                                                                        color:
+                                                                            'red',
+                                                                    }}>
+                                                                    Delete
+                                                                </button>
                                                             </TableCell>
                                                         </TableRow>
                                                     ))}

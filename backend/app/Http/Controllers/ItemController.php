@@ -1,21 +1,23 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ItemRequest;
 use App\Models\Item;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 
 class ItemController extends Controller
 {
-
-    // public function __construct()
-    // {
-    //     $this->middleware('auth');
-    // }
     public function index()
     {
-        return response()->json(Item::all(), 200);
+        $cacheKey = 'items_all';
+
+        // Cek cache, jika tidak ada baru ambil dari database
+        $items = Cache::remember($cacheKey, now()->addMinutes(30), function () {
+            return Item::all();
+        });
+
+        return response()->json($items, 200);
     }
 
     public function store(ItemRequest $request)
@@ -28,6 +30,10 @@ class ItemController extends Controller
         }
 
         $item = Item::create($validatedData);
+
+        // Setelah item baru dibuat, hapus cache yang ada
+        Cache::forget('items_all'); // Hapus cache semua item
+
         return response()->json($item, 201);
     }
 
@@ -45,6 +51,10 @@ class ItemController extends Controller
         }
 
         $item->update($validatedData);
+
+        // Setelah item diperbarui, hapus cache yang ada
+        Cache::forget('items_all'); // Hapus cache semua item
+
         return response()->json($item, 200);
     }
 
@@ -61,6 +71,10 @@ class ItemController extends Controller
             Storage::disk('public')->delete($item->image);
         }
         $item->delete();
+
+        // Setelah item dihapus, hapus cache yang ada
+        Cache::forget('items_all'); // Hapus cache semua item
+
         return response()->json(null, 204);
     }
 }

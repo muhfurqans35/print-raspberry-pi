@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
 use Exception;
+use Illuminate\Support\Facades\Cache;
 
 class ProfileController extends Controller
 {
@@ -64,6 +65,10 @@ class ProfileController extends Controller
             if ($request->filled('password')) {
                 $user->update(['password' => bcrypt($request->input('password'))]);
             }
+
+            // After updating profile, forget the cache for this user
+            Cache::forget('user_roles_permissions_' . $user->id);
+            Cache::forget('users:all');
 
             return response()->json(['message' => 'Profile updated successfully.']);
 

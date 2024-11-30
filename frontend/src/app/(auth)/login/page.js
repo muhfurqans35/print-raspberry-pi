@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/auth'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import AuthSessionStatus from '@/app/(auth)/AuthSessionStatus'
-import Loading from '@/components/Loading'
+import CircularProgress from '@mui/material/CircularProgress'
 const Login = () => {
     const router = useRouter()
 
@@ -23,6 +23,7 @@ const Login = () => {
     const [shouldRemember, setShouldRemember] = useState(false)
     const [errors, setErrors] = useState({})
     const [status, setStatus] = useState(null)
+    const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
         if (router.query?.reset && Object.keys(errors).length === 0) {
@@ -34,6 +35,7 @@ const Login = () => {
 
     const submitForm = async event => {
         event.preventDefault()
+        setIsLoading(true)
 
         try {
             await login({
@@ -49,6 +51,8 @@ const Login = () => {
             setErrors({
                 identifier: ['Login failed. Please check your credentials.'],
             })
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -120,7 +124,13 @@ const Login = () => {
                             className="underline text-sm text-gray-600 hover:text-gray-900 mr-3">
                             Forgot your password?
                         </Link>
-                        <Button type="submit">Login</Button>
+                        <Button type="submit" disabled={isLoading}>
+                            {isLoading ? (
+                                <CircularProgress size={15} />
+                            ) : (
+                                'Login'
+                            )}
+                        </Button>
                     </div>
                 </div>
             </form>

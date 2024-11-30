@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class UserController extends Controller
 {
@@ -10,22 +11,22 @@ class UserController extends Controller
     {
         $user = $request->user();
 
-        // Eager load roles with their permissions
-        $user->load('roles.permissions');
+        $cacheKey = 'user_roles_permissions_' . $user->id;
 
-        // Get direct permissions
-        $directPermissions = $user->getDirectPermissions()->pluck('name');
+        $data = Cache::remember($cacheKey, now()->addMinutes(30), function () use ($user) {
 
-        // Get permissions inherited through roles
-        $permissionsViaRoles = $user->getPermissionsViaRoles()->pluck('name');
+            $user->load('roles.permissions');
 
-        // Merge both direct and role permissions
-        $allPermissions = $directPermissions->merge($permissionsViaRoles)->unique();
+            $directPermissions = $user->getDirectPermissions()->pluck('name');
+            $permissionsViaRoles = $user->getPermissionsViaRoles()->pluck('name');
 
-        return response()->json([
-            'user' => $user,
-            'roles' => $user->roles->pluck('name'),
-            'permissions' => $allPermissions,
-        ]);
+            return [
+                'user' => $user,
+                'roles' => $user->roles->pluck('name'),
+                'permissions' => $directPermissions->merge($permissionsViaRoles)->unique()
+            ];
+        });
+
+        return response()->json($data);
     }
 }

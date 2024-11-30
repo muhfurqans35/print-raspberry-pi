@@ -75,13 +75,11 @@ class PrintRequestController extends Controller
             if ($response->successful()) {
                 // Update status print job menjadi processing
                 $printJob->update([
-                    'status' => 'processing',
                     'submitted_at' => now(),
                 ]);
 
                 return response()->json([
                     'message' => 'Print request submitted successfully',
-                    'status' => 'processing',
                     'job_id' => $printJob->print_job_id,
                     'printer' => $printer->name
                 ]);

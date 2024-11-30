@@ -1,5 +1,4 @@
 'use client'
-
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/auth'
 import {
@@ -14,14 +13,7 @@ import {
 import AuthSessionStatus from '@/app/(auth)/AuthSessionStatus'
 
 const Profile = () => {
-    const {
-        user,
-        updateProfile,
-        deleteProfile,
-        mutate,
-        loading,
-        error,
-    } = useAuth()
+    const { user, updateProfile, mutate, loading, error } = useAuth()
 
     const [name, setName] = useState(user?.name || '')
     const [email, setEmail] = useState(user?.email || '')
@@ -363,22 +355,6 @@ const Profile = () => {
                                                                     },
                                                                 }}>
                                                                 Reset
-                                                            </Button>
-                                                            <Button
-                                                                variant="outlined"
-                                                                color="error"
-                                                                onClick={
-                                                                    deleteProfile
-                                                                }
-                                                                sx={{
-                                                                    width: {
-                                                                        xs:
-                                                                            '100%',
-                                                                        sm:
-                                                                            'auto',
-                                                                    },
-                                                                }}>
-                                                                Delete Account
                                                             </Button>
                                                         </Grid>
                                                     </Grid>

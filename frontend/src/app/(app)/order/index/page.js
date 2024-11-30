@@ -1,5 +1,5 @@
 'use client'
-import { getOrder } from '@/hooks/getorder'
+import { useOrder } from '@/hooks/order'
 import { useAuth } from '@/hooks/auth'
 import {
     Container,
@@ -38,7 +38,7 @@ export default function OrderPage() {
         sortDirection: 'desc',
     })
 
-    const { data, isLoading, error, updateError } = getOrder(filters)
+    const { data, isLoading, error, updateError } = useOrder(filters)
     const orders = data?.orders || []
     const pagination = data?.pagination
     const router = useRouter()

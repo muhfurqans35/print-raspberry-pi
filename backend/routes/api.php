@@ -23,6 +23,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     Route::middleware(['permission:order_management'])->group(function () {
         Route::patch('/orders/{orderId}/status', [OrderController::class, 'updateStatus'])->name('order.status');
+        Route::delete('/orders/{orderId}', [OrderController::class, 'destroy'])->name('orders.destroy');
     });
 
     // Routes untuk Print Job dan Printer
@@ -38,7 +39,6 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     // Routes untuk User Management
     Route::apiResource('usermanagements', UserManagementController::class)->middleware('permission:user_management');
-    // Route::post('/usermanagements/{user_id}', [UserManagementController::class, 'update'])->name('usermanagements.update');
 });
 
 // Routes untuk File Preview dan Download (tidak membutuhkan middleware auth)

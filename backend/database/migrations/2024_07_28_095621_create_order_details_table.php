@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('order_details', function (Blueprint $table) {
             $table->id('order_detail_id');
-            $table->foreignId('order_id')->constrained('orders', 'order_id')->onDelete('cascade');
             $table->enum('product_type', ['print', 'item']);
             $table->unsignedBigInteger('print_job_id')->nullable();
             $table->unsignedBigInteger('item_id')->nullable();
@@ -21,6 +20,7 @@ return new class extends Migration
             $table->decimal('price', 12);
             $table->decimal('total_price', 12);
             $table->timestamps();
+            $table->foreignId('order_id')->constrained('orders', 'order_id')->onDelete('cascade');
             $table->foreign('print_job_id')->references('print_job_id')->on('print_jobs')->onDelete('set null');
             $table->foreign('item_id')->references('item_id')->on('items')->onDelete('set null');
         });

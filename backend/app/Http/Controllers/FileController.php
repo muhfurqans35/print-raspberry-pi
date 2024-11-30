@@ -16,10 +16,8 @@ class FileController extends Controller
                 'path' => 'required|string'
             ]);
 
-            // Clean and decode the path
             $filePath = $this->cleanPath($request->query('path'));
 
-            // Security check
             if (!$this->isPathAllowed($filePath)) {
                 return response()->json([
                     'message' => 'Access denied to this file location'
@@ -64,7 +62,6 @@ class FileController extends Controller
                 'path' => 'required|string'
             ]);
 
-            // Clean and decode the path
             $filePath = $this->cleanPath($request->query('path'));
 
             if (!$this->isPathAllowed($filePath)) {

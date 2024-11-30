@@ -10,38 +10,57 @@ use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class OrderController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware(['auth:sanctum']);
-    // }
+    private function clearOrderCache()
+    {
+        // Get all cache keys that start with 'orders:'
+        $keys = Cache::get('order_cache_keys', []);
+
+        // Clear each cached query
+        foreach ($keys as $key) {
+            Cache::forget($key);
+        }
+
+        // Clear the cache keys tracker
+        Cache::forget('order_cache_keys');
+    }
+
+    private function addOrderCacheKey($key)
+    {
+        $keys = Cache::get('order_cache_keys', []);
+        if (!in_array($key, $keys)) {
+            $keys[] = $key;
+            Cache::put('order_cache_keys', $keys, now()->addDays(1));
+        }
+    }
+
     public function store(OrderRequest $request)
     {
         DB::beginTransaction();
 
         try {
-            // Hitung total amount dari item dan pekerjaan cetak
+
             $totalAmount = 0;
 
             // Buat order baru
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'order_date' => now(),
-                'total_amount' => 0, // Di-update nanti setelah semua total harga dikalkulasi
+                'total_amount' => 0,
                 'status' => 'new',
             ]);
             if ($request->has('items')) {
             foreach ($request->items as $itemData) {
                 $itemId = $itemData['item_id'] ?? null;
                 if ($itemId) {
-                    $item = Item::findOrFail($itemId);// Gunakan findOrFail untuk penanganan error
+                    $item = Item::findOrFail($itemId);
                     $quantity = $itemData['quantity'];
                     $price = $item->price;
                     $totalPrice = $price * $quantity;
 
-                    // Simpan detail item ke dalam order_detail
                     OrderDetail::create([
                         'order_id' => $order->order_id,
                         'product_type' => 'item',
@@ -55,14 +74,14 @@ class OrderController extends Controller
                     }
                 }
             }
-          // Process print jobs
+
             if ($request->has('print_jobs')) {
                 foreach ($request->print_jobs as $index => $printJobData) {
                     $price = $this->calculatePrice((object) $printJobData);
                     $quantity = $printJobData['number_of_copies'];
                     $totalPrice = $price * $quantity;
 
-                    // Handle file uploads
+
                     $printFilePath = $this->handleFileUpload($request, "print_jobs.{$index}.print_file");
                     if (!$printFilePath) {
                         throw new \Exception('Print file is required');
@@ -73,7 +92,6 @@ class OrderController extends Controller
                         $cdFilePath = $this->handleFileUpload($request, "print_jobs.{$index}.cd_file");
                     }
 
-                    // Create print job first
                     $printJob = PrintJob::create([
                         'print_file_path' => $printFilePath,
                         'cover_type' => $printJobData['cover_type'] ?? null,
@@ -89,7 +107,7 @@ class OrderController extends Controller
                         'notes' => $printJobData['notes'] ?? null,
                     ]);
 
-                    // Then create order detail referencing the print job
+
                     OrderDetail::create([
                         'order_id' => $order->order_id,
                         'product_type' => 'print',
@@ -102,10 +120,11 @@ class OrderController extends Controller
                     $totalAmount += $totalPrice;
                 }
             }
-            // Update total amount pada order
             $order->update(['total_amount' => $totalAmount]);
 
             DB::commit();
+
+            $this->clearOrderCache();
 
             return response()->json($order->load('orderDetails'), 201);
         } catch (\Exception $e) {
@@ -122,18 +141,12 @@ class OrderController extends Controller
     {
         if ($request->hasFile($key)) {
             $file = $request->file($key);
-
-            // Generate a unique filename
             $filename = uniqid() . '_' . $file->getClientOriginalName();
-
-            // Store the file and get the path
             $path = $file->storeAs('uploads/print_jobs', $filename, 'public');
 
             if (!$path) {
                 throw new \Exception("Failed to store file: {$key}");
             }
-
-            // Return the full path that was stored
             return $path;
         }
         return null;
@@ -144,11 +157,11 @@ class OrderController extends Controller
         $basePrice = 0;
         $totalPrice = 0;
 
-        // Contoh perhitungan harga berdasarkan paper size
+
         switch($data->paper_size) {
             case 'A4':
                 $basePrice += 700;
-                break; // Tambahkan break untuk mencegah fall-through
+                break;
             case 'A4s':
                 $basePrice += 800;
                 break;
@@ -185,10 +198,9 @@ class OrderController extends Controller
         }
 
         if ($data->cd) {
-            $totalPrice += 25000; // Tambahan harga jika ada CD
+            $totalPrice += 25000;
         }
 
-        // Hitung total berdasarkan jumlah halaman
         $totalPrice += $basePrice * $data->number_of_pages;
 
         return $totalPrice;
@@ -196,41 +208,41 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         try {
-            // Start with base query
-            $query = Order::with(['orderDetails', 'orderDetails.item', 'orderDetails.printJob', 'user']);
 
-            if(Auth::user()->hasRole('customer')) {
-                // Filter by authenticated user
-                $query->where('user_id', Auth::id());
-            }
+            $cacheKey = 'orders:' . md5(serialize($request->all()));
 
-            // Filter by status if provided
-            if ($request->has('status') && $request->status !== 'all') {
-                $query->where('status', $request->status);
-            }
+            $this->addOrderCacheKey($cacheKey);
 
-            // Filter by date range if provided
-            if ($request->has('start_date') && $request->has('end_date')) {
-                $query->whereBetween('order_date', [
-                    $request->start_date,
-                    $request->end_date
-                ]);
-            }
+            $orders = Cache::remember($cacheKey,300, function () use ($request) {
+                $query = Order::with(['orderDetails', 'orderDetails.item', 'orderDetails.printJob', 'user']);
 
-            // Filter by user if provided
-            if ($request->has('user_id')) {
-                $query->where('user_id', $request->user_id);
-            }
+                if (Auth::user()->hasRole('customer')) {
+                    $query->where('user_id', Auth::id());
+                }
 
-            // Sort by column and direction
-            $sortColumn = $request->get('sort_by', 'order_date');
-            $sortDirection = $request->get('sort_direction', 'desc');
-            $query->orderBy($sortColumn, $sortDirection);
+                if ($request->has('status') && $request->status !== 'all') {
+                    $query->where('status', $request->status);
+                }
 
-            // Get paginated results
-            $perPage = $request->get('per_page', 10);
-            $orders = $query->paginate($perPage);
+                if ($request->has('start_date') && $request->has('end_date')) {
+                    $query->whereBetween('order_date', [
+                        $request->start_date,
+                        $request->end_date
+                    ]);
+                }
 
+                if ($request->has('user_id')) {
+                    $query->where('user_id', $request->user_id);
+                }
+
+                $sortColumn = $request->get('sort_by', 'order_date');
+                $sortDirection = $request->get('sort_direction', 'desc');
+                $query->orderBy($sortColumn, $sortDirection);
+
+                $perPage = $request->get('per_page', 10);
+
+                return $query->paginate($perPage);
+            });
 
             return response()->json([
                 'success' => true,
@@ -243,8 +255,8 @@ class OrderController extends Controller
                         'per_page' => $orders->perPage(),
                         'to' => $orders->lastItem(),
                         'total' => $orders->total(),
-                    ]
-                ]
+                    ],
+                ],
             ]);
 
         } catch (\Exception $e) {
@@ -259,21 +271,49 @@ class OrderController extends Controller
 
      public function updateStatus(Request $request, $orderId)
     {
-        // Validasi input status
         $request->validate([
-            'status' => 'required|string|in:new,accepted,printing,printed,pickup_ready,canceled,finished,failed'
+            'status' => 'required|string|in:new, processing, paid, pickup_ready, finished, canceled, failed'
         ]);
 
-        // Temukan order berdasarkan ID
         $order = Order::find($orderId);
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
 
-        // Update status order
         $order->status = $request->status;
         $order->save();
 
+        $this->clearOrderCache();
+
         return response()->json(['message' => 'Order status updated successfully', 'order' => $order], 200);
     }
+    public function destroy($orderId)
+    {
+        $order = Order::find($orderId);
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        // Hapus OrderDetails yang terkait dengan order
+        $order->orderDetails()->each(function ($orderDetail) {
+            // Hapus PrintJob terkait dengan OrderDetail
+            if ($orderDetail->printJob) {
+                $orderDetail->printJob->delete(); // Menghapus PrintJob secara manual
+            }
+
+            // Hapus OrderDetail
+            $orderDetail->delete();
+        });
+
+        // Hapus order itu sendiri
+        $order->delete();
+
+        // Hapus cache setelah order dihapus
+        $this->clearOrderCache();
+
+        return response()->json(['message' => 'Order and related data deleted successfully'], 200);
+    }
+
+
 }

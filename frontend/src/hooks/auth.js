@@ -142,22 +142,6 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
             })
     }
 
-    const deleteProfile = async () => {
-        await csrf()
-        setErrors([])
-
-        axios
-            .delete('/profile')
-            .then(() => {
-                mutate(null, false)
-                router.push('/login')
-            })
-            .catch(err => {
-                if (err.response && err.response.status !== 422) throw err
-                setErrors(err.response ? err.response.data.errors : {})
-            })
-    }
-
     useEffect(() => {
         if (!loading) {
             if (middleware === 'guest' && redirectIfAuthenticated && user) {
@@ -190,7 +174,6 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         forgotPassword,
         resetPassword,
         updateProfile,
-        deleteProfile,
         resendEmailVerification,
         logout,
         getDashboardUrl,
