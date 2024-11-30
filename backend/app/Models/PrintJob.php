@@ -32,9 +32,9 @@ class PrintJob extends Model
     {
         return $this->hasOne(OrderDetail::class, 'print_job_id');
     }
-    // Relasi Many-to-Many dengan Printer
-    public function printers()
-    {
-        return $this->belongsToMany(Printer::class, 'printer_print_job', 'print_job_id', 'printer_id');
-    }
+    // // Relasi Many-to-Many dengan Printer
+    // public function printers()
+    // {
+    //     return $this->belongsToMany(Printer::class, 'printer_print_job', 'print_job_id', 'printer_id');
+    // }
 }

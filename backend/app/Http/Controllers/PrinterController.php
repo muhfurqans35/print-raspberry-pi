@@ -5,12 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Printer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 class PrinterController extends Controller
 {
     public function Index()
     {
-        return Printer::all();
+        $cacheKey = 'printers:all';
+        $printers = Cache::remember($cacheKey, 600, function () {
+            return Printer::all();
+        });
+        return response()->json($printers);
     }
 
 
@@ -22,6 +27,7 @@ class PrinterController extends Controller
         ]);
 
         $printer = Printer::create($request->all());
+        Cache::forget('printers:all');
         return response()->json($printer, 201);
     }
 
@@ -30,11 +36,11 @@ class PrinterController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'print_job_id' => 'nullable|exists:print_jobs,print_job_id',
         ]);
 
         $printer = Printer::findOrFail($id);
         $printer->update($request->all());
+        Cache::forget('printers:all');
 
         return response()->json($printer);
     }
@@ -44,6 +50,7 @@ class PrinterController extends Controller
     {
         $printer = Printer::findOrFail($id);
         $printer->delete();
+        Cache::forget('printers:all');
 
         return response()->json(null, 204);
     }

@@ -19,7 +19,7 @@ import {
     ListItemIcon,
     Checkbox,
     ListItemText,
-    Paper,
+    Grid,
 } from '@mui/material'
 import Header from '../../../components/Header'
 
@@ -144,29 +144,58 @@ const PrintPage = () => {
                                             ))}
                                         </List>
 
-                                        <FormControl fullWidth sx={{ mb: 2 }}>
-                                            <InputLabel>
-                                                Select Printer
-                                            </InputLabel>
-                                            <Select
-                                                value={selectedPrinter}
-                                                onChange={e =>
-                                                    setSelectedPrinter(
-                                                        e.target.value,
-                                                    )
-                                                }
-                                                label="Select Printer">
-                                                {printers.map(printer => (
-                                                    <MenuItem
-                                                        key={printer.printer_id}
-                                                        value={
-                                                            printer.printer_id
-                                                        }>
-                                                        {printer.name}
-                                                    </MenuItem>
-                                                ))}
-                                            </Select>
-                                        </FormControl>
+                                        <Grid
+                                            container
+                                            spacing={2}
+                                            alignItems="center"
+                                            sx={{ mb: 2 }}>
+                                            <Grid item xs={9}>
+                                                {' '}
+                                                {/* 3/4 width */}
+                                                <FormControl fullWidth>
+                                                    <InputLabel>
+                                                        Select Printer
+                                                    </InputLabel>
+                                                    <Select
+                                                        value={selectedPrinter}
+                                                        onChange={e =>
+                                                            setSelectedPrinter(
+                                                                e.target.value,
+                                                            )
+                                                        }
+                                                        label="Select Printer">
+                                                        {printers.map(
+                                                            printer => (
+                                                                <MenuItem
+                                                                    key={
+                                                                        printer.printer_id
+                                                                    }
+                                                                    value={
+                                                                        printer.printer_id
+                                                                    }>
+                                                                    {
+                                                                        printer.name
+                                                                    }
+                                                                </MenuItem>
+                                                            ),
+                                                        )}
+                                                    </Select>
+                                                </FormControl>
+                                            </Grid>
+                                            <Grid item xs={3}>
+                                                {' '}
+                                                {/* 1/4 width */}
+                                                <Button
+                                                    variant="contained"
+                                                    onClick={fetchPrinterStatus}
+                                                    disabled={isFetchingStatus}
+                                                    fullWidth>
+                                                    {isFetchingStatus
+                                                        ? 'Fetching...'
+                                                        : 'Check Printer Status'}
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
 
                                         <Button
                                             variant="contained"
@@ -179,15 +208,6 @@ const PrintPage = () => {
                                             Submit Print
                                         </Button>
 
-                                        <Button
-                                            variant="contained"
-                                            onClick={fetchPrinterStatus}
-                                            disabled={isFetchingStatus}
-                                            sx={{ ml: 2 }}>
-                                            {isFetchingStatus
-                                                ? 'Fetching...'
-                                                : 'Check Printer Status'}
-                                        </Button>
                                         {statusMessage && (
                                             <Typography sx={{ mt: 2 }}>
                                                 {statusMessage}

@@ -13,8 +13,8 @@ class Printer extends Model
 
     protected $fillable = ['name', 'status', 'details'];
 
-    public function printJobs()
-    {
-        return $this->belongsToMany(PrintJob::class, 'printer_print_job', 'printer_id', 'print_job_id');
-    }
+    // public function printJobs()
+    // {
+    //     return $this->belongsToMany(PrintJob::class, 'printer_print_job', 'printer_id', 'print_job_id');
+    // }
 }
